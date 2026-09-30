@@ -516,4 +516,175 @@
     </building>
   </ThingDef>
 
+  <!-- BÄNKLAG: backless bench. Benches facing the same way join into one pew. -->
+  <ThingDef ParentName="SlopkeaFurnitureBase">
+    <defName>Slopkea_Bench</defName>
+    <label>BÄNKLAG bench</label>
+    <description>A plank bench with no back and no pretensions. Line them up and they join into one long pew - for dining halls, churches, or making everyone sit uncomfortably close.</description>
+    <thingClass>SlopkeaFurniture.Building_SlopkeaBench</thingClass>
+    <graphicData>
+      <texPath>Things/Building/Furniture/Slopkea/Bench/Slopkea_Bench</texPath>
+      <graphicClass>Graphic_Multi</graphicClass>
+      <shaderType>CutoutComplex</shaderType>
+      <drawSize>(1,1)</drawSize>
+    </graphicData>
+    <placingDraggableDimensions>1</placingDraggableDimensions>
+    <rotatable>true</rotatable>
+    <defaultPlacingRot>South</defaultPlacingRot>
+    <passability>PassThroughOnly</passability>
+    <pathCost>30</pathCost>
+    <fillPercent>0.3</fillPercent>
+    <stuffCategories>
+      <li>Woody</li>
+      <li>Metallic</li>
+      <li>Stony</li>
+    </stuffCategories>
+    <costStuffCount>20</costStuffCount>
+    <statBases>
+      <MaxHitPoints>60</MaxHitPoints>
+      <WorkToBuild>400</WorkToBuild>
+      <Mass>5</Mass>
+      <Flammability>1.0</Flammability>
+      <Beauty>0.5</Beauty>
+      <Comfort>0.45</Comfort>
+    </statBases>
+    <building>
+      <isSittable>true</isSittable>
+    </building>
+  </ThingDef>
+
+  <!-- GARDEROB: wardrobe. Wardrobes facing the same way join into one fitted run. -->
+  <ThingDef ParentName="SlopkeaFurnitureBase">
+    <defName>Slopkea_Wardrobe</defName>
+    <label>GARDEROB wardrobe</label>
+    <description>A tall two-door wardrobe for clothes and armour. Line them up and they join into one wall of fitted wardrobes. One door will never quite close.</description>
+    <thingClass>SlopkeaFurniture.Building_SlopkeaWardrobe</thingClass>
+    <graphicData>
+      <texPath>Things/Building/Furniture/Slopkea/Wardrobe/Slopkea_Wardrobe</texPath>
+      <graphicClass>Graphic_Multi</graphicClass>
+      <shaderType>CutoutComplex</shaderType>
+      <drawSize>(1,1)</drawSize>
+    </graphicData>
+    <placingDraggableDimensions>1</placingDraggableDimensions>
+    <rotatable>true</rotatable>
+    <defaultPlacingRot>South</defaultPlacingRot>
+    <passability>PassThroughOnly</passability>
+    <pathCost>50</pathCost>
+    <fillPercent>0.7</fillPercent>
+    <castEdgeShadows>true</castEdgeShadows>
+    <staticSunShadowHeight>0.7</staticSunShadowHeight>
+    <surfaceType>Item</surfaceType>
+    <canOverlapZones>false</canOverlapZones>
+    <stuffCategories>
+      <li>Woody</li>
+      <li>Metallic</li>
+    </stuffCategories>
+    <costStuffCount>40</costStuffCount>
+    <statBases>
+      <MaxHitPoints>100</MaxHitPoints>
+      <WorkToBuild>900</WorkToBuild>
+      <Mass>15</Mass>
+      <Flammability>1.0</Flammability>
+      <Beauty>1</Beauty>
+    </statBases>
+    <inspectorTabs>
+      <li>ITab_Storage</li>
+    </inspectorTabs>
+    <building>
+      <preventDeteriorationOnTop>true</preventDeteriorationOnTop>
+      <ignoreStoredThingsBeauty>true</ignoreStoredThingsBeauty>
+      <maxItemsInCell>3</maxItemsInCell>
+      <blueprintClass>Blueprint_Storage</blueprintClass>
+      <fixedStorageSettings>
+        <filter>
+          <categories>
+            <li>Apparel</li>
+          </categories>
+        </filter>
+      </fixedStorageSettings>
+      <defaultStorageSettings>
+        <priority>Preferred</priority>
+        <filter>
+          <categories>
+            <li>Apparel</li>
+          </categories>
+        </filter>
+      </defaultStorageSettings>
+    </building>
+  </ThingDef>
+
+  <!-- VIKSKÄRM: folding room divider. Drag a line; it blocks sight but not feet. -->
+  <ThingDef ParentName="SlopkeaFurnitureBase">
+    <defName>Slopkea_Divider</defName>
+    <label>VIKSKÄRM room divider</label>
+    <description>A folding paper screen. Drag it out along a line - it turns corners - to split a room without building a wall. Blocks line of sight; people can still squeeze past.</description>
+    <thingClass>SlopkeaFurniture.Building_SlopkeaDivider</thingClass>
+    <graphicData>
+      <texPath>Things/Building/Furniture/Slopkea/Divider/Slopkea_Divider_0</texPath>
+      <graphicClass>Graphic_Single</graphicClass>
+      <shaderType>CutoutComplex</shaderType>
+      <drawSize>(1,1)</drawSize>
+    </graphicData>
+    <placingDraggableDimensions>1</placingDraggableDimensions>
+    <rotatable>false</rotatable>
+    <passability>PassThroughOnly</passability>
+    <pathCost>60</pathCost>
+    <!-- Full fillage is what blocks line of sight. -->
+    <fillPercent>1.0</fillPercent>
+    <stuffCategories>
+      <li>Woody</li>
+      <li>Metallic</li>
+    </stuffCategories>
+    <costStuffCount>10</costStuffCount>
+    <costList>
+      <Cloth>5</Cloth>
+    </costList>
+    <statBases>
+      <MaxHitPoints>40</MaxHitPoints>
+      <WorkToBuild>300</WorkToBuild>
+      <Mass>3</Mass>
+      <Flammability>1.0</Flammability>
+      <Beauty>1</Beauty>
+    </statBases>
+  </ThingDef>
+
+  <!-- ODLÅDA: raised planter bed. Drag out any shape; grows crops. -->
+  <ThingDef ParentName="SlopkeaFurnitureBase">
+    <defName>Slopkea_Planter</defName>
+    <label>ODLÅDA planter box</label>
+    <description>A raised timber bed of good soil. Drag out any shape and the beds join into one; grows anything that grows in the ground, a little better than the ground does. Indoors, it still needs light.</description>
+    <thingClass>SlopkeaFurniture.Building_SlopkeaPlanter</thingClass>
+    <graphicData>
+      <texPath>Things/Building/Furniture/Slopkea/Planter/Slopkea_Planter_0</texPath>
+      <graphicClass>Graphic_Single</graphicClass>
+      <shaderType>CutoutComplex</shaderType>
+      <drawSize>(1,1)</drawSize>
+    </graphicData>
+    <altitudeLayer>FloorEmplacement</altitudeLayer>
+    <placingDraggableDimensions>2</placingDraggableDimensions>
+    <rotatable>false</rotatable>
+    <passability>Standable</passability>
+    <pathCost>20</pathCost>
+    <fillPercent>0.2</fillPercent>
+    <castEdgeShadows>false</castEdgeShadows>
+    <staticSunShadowHeight>0</staticSunShadowHeight>
+    <stuffCategories>
+      <li>Woody</li>
+      <li>Stony</li>
+    </stuffCategories>
+    <costStuffCount>15</costStuffCount>
+    <statBases>
+      <MaxHitPoints>60</MaxHitPoints>
+      <WorkToBuild>350</WorkToBuild>
+      <Mass>8</Mass>
+      <Flammability>1.0</Flammability>
+      <Beauty>1</Beauty>
+      <Fertility>1.1</Fertility>
+    </statBases>
+    <building>
+      <sowTag>Ground</sowTag>
+      <defaultPlantToGrow>Plant_Potato</defaultPlantToGrow>
+    </building>
+  </ThingDef>
+
 </Defs>

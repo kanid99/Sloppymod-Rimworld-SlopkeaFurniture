@@ -143,6 +143,27 @@ for p in (dk.BOOKEND_EAST, dk.BOOKEND_NORTH):
 for mod in dk.MODULES:
     check(f'KitchenPaths.Dir + "{mod}_"' in kr, f"KitchenRun.cs: no print path for {mod}")
 
+# Bench, wardrobe (side joins) and divider, planter (bits).
+import draw_more as dmo
+for f in FACINGS:
+    for cw in "oj":
+        for ccw in "oj":
+            joined = {s_ for s_, st in ((CW[f], cw), (CCW[f], ccw)) if st == "j"}
+            for kind in ("Bench", "Wardrobe"):
+                check(os.path.exists(dmo.side_path(kind, f, cw, ccw, True)), f"missing {kind} mask")
+                check_edges(dmo.side_path(kind, f, cw, ccw), {"north", "east", "south", "west"} - joined)
+for i in range(16):
+    open_s = {s_ for s_, b in BITS.items() if not i & b}
+    for fn in (dmo.divider_path, dmo.planter_path):
+        check(os.path.exists(fn(i, True)), f"missing {fn(i, True)}")
+        check_edges(fn(i), open_s)
+mf = open("Source/SlopkeaFurniture/MoreFurniture.cs").read()
+for name, sample in (("Bench", dmo.side_path("Bench", "north", "o", "o")),
+                     ("Wardrobe", dmo.side_path("Wardrobe", "north", "o", "o")),
+                     ("Divider", dmo.divider_path(0)), ("Planter", dmo.planter_path(0))):
+    got = mf.split(f'{name} = "', 1)[1].split('"', 1)[0]
+    check(sample.startswith("Textures/" + got), f"MoreFurniture.cs {name}: {got} vs {sample}")
+
 # Joined edges carry on into the neighbour: the two edges that meet must match.
 def edge_mean(path, side):
     px = edge_pixels(Image.open(path).convert("RGBA"), side, 1)
@@ -183,4 +204,4 @@ check('"north", "east", "south", "west"' in src, "sectional facing names out of 
 if errors:
     print("\n".join(errors))
     sys.exit(1)
-print("art ok: table, sectional, rocking chairs, desk, rug, shelf, kitchen and bookcase variants; defs and C# agree")
+print("art ok: table, sectional, rocking chairs, desk, rug, shelf, kitchen, bookcase, bench, wardrobe, divider and planter variants; defs and C# agree")

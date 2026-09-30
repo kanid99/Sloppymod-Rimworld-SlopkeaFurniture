@@ -11,6 +11,10 @@ Flat-pack, IKEA-inspired furniture for RimWorld 1.6. Some assembly required.
 - **MATTBIT rug segment** – drag out any rug shape; the border follows the outline, and furniture stands on it.
 - **SKÅPKÖK kitchen run** – cabinet (stores food), sink (room cleanliness) and hob (electric stove; cooks everything the vanilla electric stove does, via `Patches/Slopkea_HobRecipes.xml`). Any modules facing the same way join into one counter.
 - **HYLLVIK bookcase** – a vanilla bookcase (`Building_Bookcase`: holds, shows and lends out books, reading bonus) with empty shelves; vanilla fills them with whatever books are stored. Units facing the same way join into a run.
+- **BÄNKLAG bench** – backless seating; benches facing the same way join into one pew.
+- **GARDEROB wardrobe** – apparel storage, three stacks per unit; joins into a fitted run.
+- **VIKSKÄRM room divider** – drag a line of paper screen (it turns corners); blocks line of sight, passable.
+- **ODLÅDA planter box** – drag out a raised crop bed of any shape; grows ground crops at 110% fertility.
 - **GLÖMSTRÄK table segment** – 1x1 dining-table panels placed with an area drag. Adjacent panels merge: rim only on exposed sides, legs only on outside corners. Any shape works and every cell is an eating surface.
 
 ## Layout

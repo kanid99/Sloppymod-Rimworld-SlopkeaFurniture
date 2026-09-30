@@ -100,6 +100,19 @@ def render(scene, colors, size, cell_px=CELL, bg=(92, 84, 72), rugs=()):
             else:
                 p, m = kitchen_path(thing[0], thing[1], *st), kitchen_path(thing[0], thing[1], *st, mask=True)
             tile = tinted(p, colors.get(thing[0], (235, 232, 222)), m)
+        elif thing[0] in ("Bench", "Wardrobe"):
+            from draw_more import side_path
+            st = []
+            for side in (CW[thing[1]], CCW[thing[1]]):
+                n = scene.get(step((x, z), side))
+                st.append("j" if n and n[0] == thing[0] and n[1] == thing[1] else "o")
+            tile = tinted(side_path(thing[0], thing[1], *st), colors.get(thing[0], (200, 160, 110)),
+                          side_path(thing[0], thing[1], *st, mask=True))
+        elif thing[0] in ("divider", "planter"):
+            from draw_more import divider_path, planter_path
+            fn = divider_path if thing[0] == "divider" else planter_path
+            i = bits_index(same(thing[0]), (x, z))
+            tile = tinted(fn(i), colors.get(thing[0], (170, 120, 80)), fn(i, True))
         elif thing[0] == "shelf":
             cw, ccw = shelf_states(scene, (x, z))
             tile = tinted(shelf_path(thing[1], cw, ccw), colors.get("shelf", (240, 240, 236)),

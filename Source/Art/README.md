@@ -133,6 +133,22 @@ Rotation is the way the **front** faces, as for every Slopkea piece. That is the
 vanilla workbenches, whose rotation is the way the worker faces, so the hob's
 `interactionCellOffset` is `(0,0,1)`, which puts the cook at the front.
 
+## Bench, wardrobe, divider and planter
+
+These are in `draw_more.py`. The bench and wardrobe join along their sides like the
+shelving. The divider and planter take bit variants like the table.
+
+* **Bench:** it has no front or back, so north draws as south and west as east. Legs stand
+  only at open ends.
+* **Wardrobe:** two doors per unit, steel knobs (untinted), and a shared carcass wall
+  between joined units.
+* **Divider:** it follows its joins. An east-west run shows the paper panels face-on, and a
+  north-south run is seen edge-on as the frame's top rail, so a corner shows both. The paper
+  is untinted, and the frame and lattice take the stuff colour.
+* **Planter:** the soil is untinted, and the timber rim runs only round the outside of the
+  dragged shape, so the bed reads as one. Furrows sit on fixed fractions of the cell, so they
+  line up across cells.
+
 ## The contract with the C#
 
 `verify_art.py` checks:

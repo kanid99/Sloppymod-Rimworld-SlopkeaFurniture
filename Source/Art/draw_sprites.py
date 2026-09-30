@@ -390,8 +390,11 @@ def main():
     rugs = draw_modular.draw_all()
     import draw_kitchen
     draw_kitchen.draw_all()
+    import draw_more
+    draw_more.draw_all()
     print(f"drew 16 table and 36 sectional variants, 2 rocking chairs, "
-          f"16 desk, {rugs} rug and 16 shelf variants, 48 kitchen and 16 bookcase variants")
+          f"16 desk, {rugs} rug and 16 shelf variants, 48 kitchen and 16 bookcase variants, "
+          f"16 each of bench, wardrobe, divider and planter")
 
 
 if __name__ == "__main__":
