@@ -8,7 +8,9 @@ neighbours; verify_art.py checks the two agree.
 import os
 import shutil
 
-from slopkea_draw import (CCW, CW, OPP, SEAM, TOP, TOP_LIT, WALL, WALL_DARK, FOOT,
+from PIL import Image
+
+from slopkea_draw import (SS, CCW, CW, OPP, SEAM, TOP, TOP_LIT, WALL, WALL_DARK, FOOT,
                           OAK, OAK_DARK, OAK_LIT, OAK_WALL,
                           Canvas, local_rect)
 
@@ -145,54 +147,116 @@ def rocker_path(kind, facing, mask=False):
 
 
 def draw_rocking_chair(kind, facing):
-    """A rocking chair, laid out in its own frame (a across, f front to back).
+    """A rocking chair, drawn as a VIEW per facing - like vanilla furniture, in
+    three-quarter elevation rather than as a floor plan. From straight above a
+    rocking chair is just a box; what says "rocking chair" is the curved runner
+    under it and the tall back, so every view is built to show those.
 
     Wood: the stuff is the whole chair. Cloth: the stuff is the upholstery only,
     on a fixed oak frame, so the frame is black in the mask.
     """
+    if facing == "west":
+        return  # mirrored from east in main(): the chair is symmetric side to side
     cloth = kind == "Cloth"
-    frame = dict(face=OAK, wall=OAK_WALL, lit=OAK_LIT, wall_dark=OAK_DARK, tint=False) if cloth else {}
+    t = not cloth
+    if cloth:
+        F_LIT, F, F_MID, F_WALL = OAK_LIT, OAK, (148, 108, 70), OAK_WALL
+    else:
+        F_LIT, F, F_MID, F_WALL = TOP_LIT, TOP, (204, 204, 204), WALL
     cv = Canvas()
-    L = lambda a0, a1, f0, f1: local_rect(facing, a0, a1, f0, f1)
+    ln = lambda pts, w, c: cv.line(pts, w, c, t)
+    poly = lambda pts, c: cv.poly(pts, c, t)
+    knob = lambda x, y, r, c: cv.ellipse((x - r, y - r, x + r, y + r), c, t)
+    # A soft floor shadow under the whole chair (alpha below the silhouette threshold).
+    cv.soft_shadow((0.14, 0.84, 0.86, 0.93), off=(0.0, 0.0))
 
-    parts = []
-    # Rockers: two long runners, past the seat both ways - the thing that says "rocking".
-    # Each runner tapers to half width over its last tenth at both tips, so it
-    # reads as a curve lifting off the floor rather than a plank.
-    for a0, a1 in ((0.2, 0.27), (0.73, 0.8)):
-        mid = (a0 + a1) / 2
-        parts.append((L(a0, a1, 0.12, 0.88), 0.03, "rocker"))
-        for f0, f1 in ((0.03, 0.12), (0.88, 0.97)):
-            parts.append((L(mid - 0.018, mid + 0.018, f0, f1), 0.02, "rocker"))
-    parts.append((L(0.27, 0.73, 0.22, 0.74), 0.12, "seat"))
-    for a0, a1 in ((0.24, 0.31), (0.69, 0.76)):
-        parts.append((L(a0, a1, 0.26, 0.74), 0.24, "arm"))
-    parts.append((L(0.25, 0.75, 0.74, 0.88), 0.4, "back"))
-    parts.sort(key=lambda p: (p[2] != "rocker", p[0][3], p[1]))
+    if facing == "east":
+        # Side profile, facing right. The runner is a smile: low in the middle, both
+        # ends lifting off the floor. Everything else stands on it.
+        ry = lambda x: 0.86 - 0.45 * (x - 0.5) ** 2
+        xs = [0.06 + k * 0.02 for k in range(45)]
+        ln([(x, ry(x)) for x in xs], 0.07, F_WALL)
+        ln([(x, ry(x) - 0.018) for x in xs[2:-2]], 0.022, F)             # lit top of the runner
+        for x in (0.36, 0.70):                                              # legs
+            ln([(x, ry(x)), (x, 0.56)], 0.065, F_MID)
+        ln([(0.34, 0.54), (0.19, 0.07)], 0.075, F)                          # back post, leaning back
+        knob(0.19, 0.07, 0.045, F_LIT)                                      # crest
+        poly([(0.28, 0.50), (0.78, 0.50), (0.78, 0.53), (0.28, 0.53)], F_LIT)  # seat top
+        poly([(0.28, 0.53), (0.78, 0.53), (0.78, 0.59), (0.28, 0.59)], F_MID)  # seat edge
+        if cloth:
+            cv.line([(0.41, 0.46), (0.28, 0.13)], 0.09, TOP)                # back pad
+            cv.line([(0.40, 0.44), (0.29, 0.15)], 0.03, TOP_LIT)
+            cv.poly([(0.36, 0.43), (0.76, 0.44), (0.77, 0.50), (0.35, 0.50)], TOP)   # seat cushion
+            cv.poly([(0.36, 0.43), (0.76, 0.44), (0.76, 0.455), (0.36, 0.445)], TOP_LIT)
+        ln([(0.71, 0.52), (0.73, 0.37)], 0.055, F_MID)                      # arm support
+        ln([(0.29, 0.33), (0.75, 0.36)], 0.06, F)                           # arm rail
+        knob(0.76, 0.36, 0.04, F_LIT)                                       # arm scroll
 
-    for r, h, name in parts:
-        if name == "rocker":
-            cv.slab(r, h, **(frame or dict(face=WALL, wall=WALL_DARK)))
-            continue
-        if name == "seat":
-            cv.slab(r, h, **frame)
-            if cloth:
-                cv.slab(L(0.32, 0.68, 0.25, 0.72), 0.05)          # seat cushion
-            else:
-                for f in (0.33, 0.46, 0.59):                       # slats
-                    cv.rect(L(0.27, 0.73, f - 0.005, f + 0.005), SEAM)
-        elif name == "arm":
-            cv.slab(r, h, **frame)
-        elif name == "back":
-            cv.slab(r, h, **frame)
-            if cloth:
-                cv.slab(L(0.3, 0.7, 0.755, 0.865), 0.08)        # padded back
-            else:
-                for a in (0.35, 0.45, 0.55, 0.65):                 # spindles
-                    x0, y0, x1, y1 = L(a - 0.012, a + 0.012, 0.755, 0.865)
-                    cv.rect((x0, y0, x1, y1), SEAM)
-    cv.silhouette({"north", "east", "south", "west"})
+    elif facing == "south":
+        # Front view, facing the viewer: the tall back rises above the seat, and the
+        # runners come towards us under it and curl up at the tips.
+        for x in (0.27, 0.73):
+            ln([(x, 0.50), (x, 0.90)], 0.06, F_WALL)                        # runner, end-on
+            knob(x, 0.91, 0.042, F)                                         # curled tip
+        for x in (0.25, 0.75):
+            ln([(x, 0.52), (x, 0.07)], 0.07, F)                             # back posts
+            knob(x, 0.06, 0.042, F_LIT)                                     # finials
+        ln([(0.25, 0.13), (0.5, 0.085), (0.75, 0.13)], 0.075, F)            # curved crest rail
+        ln([(0.25, 0.45), (0.75, 0.45)], 0.05, F_MID)                       # lower back rail
+        if cloth:
+            cv.poly([(0.30, 0.15), (0.70, 0.15), (0.70, 0.44), (0.30, 0.44)], TOP)
+            cv.poly([(0.30, 0.15), (0.70, 0.15), (0.70, 0.18), (0.30, 0.18)], TOP_LIT)
+            for x in (0.40, 0.5, 0.60):                                      # tufting
+                cv.rect((x - 0.012, 0.29, x + 0.012, 0.31), SEAM)
+        else:
+            for x in (0.34, 0.42, 0.5, 0.58, 0.66):                           # spindles
+                ln([(x, 0.16), (x, 0.43)], 0.032, F_MID)
+        poly([(0.23, 0.47), (0.77, 0.47), (0.80, 0.67), (0.20, 0.67)], F)    # seat top
+        poly([(0.23, 0.47), (0.77, 0.47), (0.775, 0.49), (0.225, 0.49)], F_LIT)
+        poly([(0.20, 0.67), (0.80, 0.67), (0.80, 0.72), (0.20, 0.72)], F_WALL)  # seat front edge
+        if cloth:
+            cv.poly([(0.29, 0.50), (0.71, 0.50), (0.73, 0.65), (0.27, 0.65)], TOP)
+            cv.poly([(0.29, 0.50), (0.71, 0.50), (0.713, 0.52), (0.287, 0.52)], TOP_LIT)
+        for x in (0.25, 0.75):
+            ln([(x, 0.72), (x, 0.84)], 0.06, F_MID)                         # front legs
+        for x in (0.17, 0.83):
+            ln([(x, 0.60), (x, 0.73)], 0.05, F_MID)                         # arm supports
+            ln([(x, 0.30), (x, 0.61)], 0.06, F)                             # arm rails
+            knob(x, 0.62, 0.042, F_LIT)                                     # arm scrolls
+
+    elif facing == "north":
+        # Rear view, facing away: the back of the backrest is nearest us and rises up
+        # the screen; the runners run out past it at both ends.
+        for x in (0.27, 0.73):
+            ln([(x, 0.08), (x, 0.92)], 0.06, F_WALL)                        # runners
+            knob(x, 0.07, 0.036, F)                                          # front tips
+            knob(x, 0.93, 0.042, F)                                          # rear tips
+        poly([(0.23, 0.22), (0.77, 0.22), (0.79, 0.40), (0.21, 0.40)], F)     # seat, beyond the back
+        for x in (0.17, 0.83):
+            ln([(x, 0.16), (x, 0.48)], 0.06, F)                             # arm rails
+            knob(x, 0.15, 0.04, F_LIT)
+        for x in (0.25, 0.75):
+            ln([(x, 0.86), (x, 0.30)], 0.07, F)                             # back posts
+            knob(x, 0.29, 0.042, F_LIT)
+        ln([(0.25, 0.36), (0.5, 0.315), (0.75, 0.36)], 0.075, F)            # crest rail
+        ln([(0.25, 0.72), (0.75, 0.72)], 0.05, F_MID)                       # lower back rail
+        if cloth:
+            cv.poly([(0.30, 0.38), (0.70, 0.38), (0.70, 0.71), (0.30, 0.71)], WALL)  # back of the pad
+        else:
+            for x in (0.34, 0.42, 0.5, 0.58, 0.66):
+                ln([(x, 0.39), (x, 0.70)], 0.032, F_MID)
+        for x in (0.25, 0.75):
+            ln([(x, 0.74), (x, 0.88)], 0.06, F_MID)                         # back legs
+
+    cv.silhouette({"north", "east", "south", "west"}, ring=3 * SS)
     cv.save(rocker_path(kind, facing), rocker_path(kind, facing, mask=True) if cloth else None)
+
+
+def mirror_east_to_west(kind):
+    """Graphic_Multi would mirror east for west anyway; write it so every view exists."""
+    for mask in ((False, True) if kind == "Cloth" else (False,)):
+        Image.open(rocker_path(kind, "east", mask)).transpose(Image.FLIP_LEFT_RIGHT).save(
+            rocker_path(kind, "west", mask))
 
 
 def main():
@@ -212,6 +276,7 @@ def main():
     for kind in ROCKER_KINDS:
         for facing in FACINGS:
             draw_rocking_chair(kind, facing)
+        mirror_east_to_west(kind)
     print("drew 16 table and 36 sectional variants, 2 rocking chairs")
 
 

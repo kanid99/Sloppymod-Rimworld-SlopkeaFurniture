@@ -91,7 +91,7 @@ for kind in ROCKER_KINDS:
                 reds = [r > 127 for r, g, b in Image.open(m).convert("RGB").get_flattened_data()]
                 solid = [v > 127 for v in a.get_flattened_data()]
                 share = sum(r and s_ for r, s_ in zip(reds, solid)) / max(1, sum(solid))
-                check(0.3 < share < 0.8, f"{m}: {share:.0%} of the chair tinted, want upholstery only")
+                check(0.15 < share < 0.8, f"{m}: {share:.0%} of the chair tinted, want upholstery only")
 
 # Joined edges carry on into the neighbour: the two edges that meet must match.
 def edge_mean(path, side):

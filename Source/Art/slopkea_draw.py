@@ -56,6 +56,27 @@ class Canvas:
         self.d.rectangle(box, fill=fill)
         self.md.rectangle(box, fill=(255, 0, 0) if tint else (0, 0, 0))
 
+    def _pts(self, pts):
+        return [(px(x), px(y)) for x, y in pts]
+
+    def poly(self, pts, fill, tint=True):
+        self.d.polygon(self._pts(pts), fill=fill)
+        self.md.polygon(self._pts(pts), fill=(255, 0, 0) if tint else (0, 0, 0))
+
+    def line(self, pts, width, fill, tint=True):
+        """A thick stroke with round joints and round ends."""
+        w = px(width)
+        p = self._pts(pts)
+        for d, f in ((self.d, fill), (self.md, (255, 0, 0) if tint else (0, 0, 0))):
+            d.line(p, fill=f, width=w, joint="curve")
+            for x, y in (p[0], p[-1]):
+                d.ellipse([x - w // 2, y - w // 2, x + w // 2, y + w // 2], fill=f)
+
+    def ellipse(self, r, fill, tint=True):
+        box = [px(r[0]), px(r[1]), px(r[2]), px(r[3])]
+        self.d.ellipse(box, fill=fill)
+        self.md.ellipse(box, fill=(255, 0, 0) if tint else (0, 0, 0))
+
     def soft_shadow(self, r, off=(0.02, 0.03)):
         """Cast shadow down and right, soft, drawn before the part that casts it."""
         layer = Image.new("RGBA", (C, C), (0, 0, 0, 0))
@@ -85,7 +106,7 @@ class Canvas:
         if "north" not in joined:
             self.rect((x0, y0, x1, y0 + 0.012), lit, tint)
 
-    def silhouette(self, open_sides):
+    def silhouette(self, open_sides, ring=RING):
         """Black ring on the outer silhouette only.
 
         Joined sides continue into the neighbouring cell, so the canvas is padded
@@ -113,7 +134,7 @@ class Canvas:
             if v not in open_sides and hz not in open_sides:
                 pd.rectangle(box, fill=255)
         er = pad
-        for _ in range(RING):
+        for _ in range(ring):
             er = er.filter(ImageFilter.MinFilter(3))
         er = er.crop((RING, RING, RING + C, RING + C))
         ring = ImageChops.subtract(a, er)

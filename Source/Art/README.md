@@ -48,14 +48,34 @@ neighbours.
 
 ## Rocking chairs
 
-Free-standing, so one view per facing and no variants: `Slopkea_RockingChair<Wood|Cloth>_<rot>`.
-Two runners run past the seat front and back, each tapering over its last tenth at both ends
-so it reads as a curve lifting off the floor. The wooden chair is all stuff (slats and
-spindles as identical marks). The cloth chair's stuff is the upholstery only: its frame is a
-fixed oak, black in the mask, so `verify_art.py` checks the tinted share is upholstery-sized.
+Free-standing, so they have one view per facing and no variants:
+`Slopkea_RockingChair<Wood|Cloth>_<rot>`.
 
-The rocking is not in the art. `Building_SlopkeaRockingChair` is drawn in real time and eases
-the whole sprite back and forth along its facing while someone sits in it.
+**They are drawn in elevation, not as a floor plan.** From straight above, a rocking chair is
+a box with two sticks beside it, and the first version read exactly like that. What makes it a
+rocking chair is the curved runner and the tall back, so each view is built to show them.
+Vanilla furniture takes the same three-quarter view.
+
+* **East:** side profile, and the view that sells it. The runner is a smile, low in the middle
+  with both ends lifting off the floor. The legs stand on it, and the back post leans back
+  to a round crest.
+* **South:** from the front. The tall back rises above the seat, with spindles on the wooden
+  chair and a tufted pad on the cloth one. The runners come towards us under it and end in
+  curled tips.
+* **North:** from behind. The back of the backrest is nearest and rises up the screen, and the
+  runners run out past it at both ends.
+* **West:** east mirrored, because the chair is symmetric side to side.
+
+Parts are round-ended strokes (`Canvas.line`) rather than slabs, and the silhouette ring is
+3px here rather than 4px, so the thin turned parts keep some wood inside their outline.
+
+The wooden chair is all stuff. On the cloth chair, the stuff is only the upholstery: the frame
+is a fixed oak, black in the mask. `verify_art.py` checks that the tinted share is
+upholstery-sized. It is 15-80% because a side view shows less pad.
+
+**The rocking is not in the art.** `Building_SlopkeaRockingChair` is drawn in real time while
+someone sits in it. In the side views it tilts the sprite up to 4 degrees on its runner. The
+front and back views cannot show a tilt, so there it eases back and forth along its facing.
 
 ## The contract with the C#
 

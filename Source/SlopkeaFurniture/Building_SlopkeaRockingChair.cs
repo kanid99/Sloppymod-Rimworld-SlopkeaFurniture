@@ -5,14 +5,17 @@ using Verse;
 namespace SlopkeaFurniture
 {
     /// <summary>
-    /// A rocking chair that rocks while someone sits in it: the chair eases back
-    /// and forth along its facing. Drawn in real time (drawerType RealtimeOnly)
+    /// A rocking chair that rocks while someone sits in it. In the side views the
+    /// sprite tilts a few degrees on its runner; front and back views cannot show
+    /// a tilt, so there it eases back and forth along its facing instead. Drawn in
+    /// real time (drawerType RealtimeOnly)
     /// because a map-mesh texture cannot move. The rock is driven by game ticks,
     /// so it stops when paused and speeds up with the game.
     /// </summary>
     public class Building_SlopkeaRockingChair : Building
     {
         private const float RockDistance = 0.035f;   // cells, at the end of each swing
+        private const float RockAngle = 4f;          // degrees, side views
         private const float RockSpeed = 0.06f;       // radians per tick
 
         private bool Occupied()
@@ -27,7 +30,13 @@ namespace SlopkeaFurniture
             {
                 // Offset per-thing so two chairs side by side do not rock in lockstep.
                 float t = (Find.TickManager.TicksGame + thingIDNumber * 37) * RockSpeed;
-                drawLoc += Rotation.FacingCell.ToVector3() * (Mathf.Sin(t) * RockDistance);
+                float s = Mathf.Sin(t);
+                if (Rotation.IsHorizontal)
+                {
+                    Graphic.Draw(drawLoc, flip ? Rotation.Opposite : Rotation, this, s * RockAngle);
+                    return;
+                }
+                drawLoc += Rotation.FacingCell.ToVector3() * (s * RockDistance);
             }
             base.DrawAt(drawLoc, flip);
         }
