@@ -34,8 +34,8 @@ GAP = 0.02
 H_PLINTH, H_CUSHION, H_ARM, H_BACK = 0.06, 0.10, 0.22, 0.32
 
 # Table layout, in screen fractions.
-TABLE_TOP_END = 0.80     # where the top face stops when the front (south) is open
-TABLE_APRON_END = 0.90   # apron (the table's wall) below it; legs below that
+TABLE_TOP_END = 0.76     # where the top face stops when the front (south) is open
+TABLE_APRON_END = 0.85   # apron (the table's wall) below it; legs below that
 
 
 def table_path(i):
@@ -68,10 +68,13 @@ def draw_table(i):
         cv.rect((0, top_end, 1, TABLE_APRON_END), WALL)
         cv.rect((0, top_end, 1, top_end + 0.008), WALL_DARK)
         # Legs only at outside corners: the apron runs on under a joined side.
+        # Chunky, like VFE's: a leg reads at play zoom or it is not there.
         if "west" in open_sides:
-            cv.rect((0.03, TABLE_APRON_END, 0.13, 1.0), WALL_DARK)
+            cv.rect((0.04, TABLE_APRON_END, 0.19, 1.0), WALL)
+            cv.rect((0.04, TABLE_APRON_END, 0.07, 1.0), TOP)
         if "east" in open_sides:
-            cv.rect((0.87, TABLE_APRON_END, 0.97, 1.0), WALL_DARK)
+            cv.rect((0.81, TABLE_APRON_END, 0.96, 1.0), WALL)
+            cv.rect((0.81, TABLE_APRON_END, 0.84, 1.0), TOP)
     cv.silhouette(open_sides)
     cv.save(table_path(i))
 
@@ -247,7 +250,7 @@ def draw_rocking_chair(kind, facing):
             for x in RX:
                 ln([(x - 0.02 if x < 0.5 else x + 0.02, 0.76), (x, 0.86)], 0.058, F_MID)  # rear legs
 
-    cv.silhouette({"north", "east", "south", "west"}, ring=3 * SS)
+    cv.silhouette({"north", "east", "south", "west"}, ring=5 * SS)
     cv.save(rocker_path(kind, facing))
 
 
@@ -357,7 +360,7 @@ def draw_glider(facing):
         fr([(0.28, 0.44), (0.80, 0.44), (0.81, 0.455), (0.28, 0.455)], PAINT_LIT)
         pillow(0.28, 0.36, 0.72, 0.47)
 
-    cv.silhouette({"north", "east", "south", "west"}, ring=3 * SS)
+    cv.silhouette({"north", "east", "south", "west"}, ring=5 * SS)
     cv.save(rocker_path("Cloth", facing), rocker_path("Cloth", facing, mask=True))
 
 

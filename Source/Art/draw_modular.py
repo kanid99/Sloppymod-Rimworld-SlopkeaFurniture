@@ -42,8 +42,8 @@ def rug_variants():
 
 # --- Desk ---------------------------------------------------------------------------
 
-DESK_TOP_END = 0.84   # a slimmer top than the table's: it's a laminate slab, not planks
-DESK_EDGE_END = 0.89
+DESK_TOP_END = 0.78   # a slimmer top than the table's: it's a laminate slab, not planks
+DESK_EDGE_END = 0.84
 
 
 def draw_desk(i):
@@ -65,9 +65,9 @@ def draw_desk(i):
         cv.rect((1 - band, 0, 1, top_end), SEAM)
     if south_open:
         cv.rect((0, top_end, 1, DESK_EDGE_END), WALL)
-        for side, x0 in (("west", 0.05), ("east", 0.90)):
+        for side, x0 in (("west", 0.05), ("east", 0.86)):
             if side in open_sides:
-                cv.rect((x0, DESK_EDGE_END, x0 + 0.05, 1.0), FOOT, tint=False)
+                cv.rect((x0, DESK_EDGE_END, x0 + 0.09, 1.0), FOOT, tint=False)
     cv.silhouette(open_sides)
     cv.save(desk_path(i), desk_path(i, mask=True))
 
@@ -121,14 +121,14 @@ def draw_rug(i, c):
             ey = 1 if "south" in (s1, s2) else 0
             cv.rect((min(cx, ex), cy, max(cx + ln, ex), cy + ln), BORDER_LINE)
             cv.rect((cx, min(cy, ey), cx + ln, max(cy + ln, ey)), BORDER_LINE)
-    cv.silhouette(open_sides, ring=2 * SS)
+    cv.silhouette(open_sides, ring=4 * SS)
     cv.save(rug_path(i, c))
 
 
 # --- Cube shelving ------------------------------------------------------------------
 
-CUBBY = (78, 78, 78)        # the inside of a cube: dark, but still stuff-tinted
-CUBBY_TOP = (58, 58, 58)    # the shadow under the shelf above
+CUBBY = (124, 124, 124)        # the inside of a cube: dark, but still stuff-tinted
+CUBBY_TOP = (100, 100, 100)    # the shadow under the shelf above
 
 
 def draw_shelf(facing, cw, ccw):

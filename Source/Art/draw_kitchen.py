@@ -132,8 +132,8 @@ def draw_bookcase(facing, cw, ccw):
         cv.rect((0, 0.02, 1, 0.08), TOP_LIT)
         x0, x1 = w("west"), 1 - w("east")
         for y0, y1 in ((0.11, 0.37), (0.40, 0.66), (0.69, 0.94)):
-            cv.rect((x0, y0, x1, y1), WALL_DARK)                # the back panel, in shade
-            cv.rect((x0, y0, x1, y0 + 0.035), (96, 96, 96))     # under the shelf above
+            cv.rect((x0, y0, x1, y1), (150, 150, 150))           # the back panel, in shade
+            cv.rect((x0, y0, x1, y0 + 0.035), (120, 120, 120))  # under the shelf above
             cv.rect((x0, y1 - 0.02, x1, y1), WALL)              # the shelf's lit front lip
     elif facing == "north":
         cv.rect((0, 0.02, 1, 0.98), TOP)
@@ -151,7 +151,7 @@ def draw_bookcase(facing, cw, ccw):
             cv.rect((0.06, y1 - 0.06, 0.94, y1), WALL)
         fx0, fx1 = (0.72, 0.94) if right else (0.06, 0.28)       # the open front, empty
         ya, yb = y0 + w("north"), y1 - w("south") - (0.06 if "south" not in joined else 0)
-        cv.rect((fx0, ya, fx1, yb), WALL_DARK)
+        cv.rect((fx0, ya, fx1, yb), (150, 150, 150))
     cv.silhouette(open_sides)
     cv.save(book_path(facing, cw, ccw), book_path(facing, cw, ccw, True))
 

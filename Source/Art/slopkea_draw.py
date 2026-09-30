@@ -10,13 +10,13 @@ from PIL import Image, ImageChops, ImageDraw, ImageFilter
 CELL = 192          # final pixels per cell, as the other SloppyMods furniture
 SS = 4              # supersample factor
 C = CELL * SS       # working canvas per cell
-RING = 4 * SS       # silhouette ring width (4px final)
+RING = 7 * SS       # silhouette ring width (7px final: VFE's outline is ~2.7% of a cell)
 LIFT = 0.55         # how far one cell of height rises up the screen
 
 # Stuff-tinted tones. RimWorld multiplies these by the stuff colour, so they are
 # light neutral greys; depth is the step between them, never an outline.
-TOP_LIT = (246, 246, 246)
-TOP = (228, 228, 228)
+TOP_LIT = (252, 252, 252)
+TOP = (236, 236, 236)
 SEAM = (196, 196, 196)
 WALL = (162, 162, 162)
 WALL_DARK = (128, 128, 128)
@@ -87,6 +87,16 @@ class Canvas:
         layer.putalpha(a)
         self.img.alpha_composite(layer)
 
+    def ramp(self, r, c_top, c_bottom, tint=True):
+        """A vertical ramp, one row per supersampled pixel."""
+        x0, y0, x1, y1 = (px(v) for v in r)
+        n = max(1, y1 - y0)
+        for k in range(n):
+            f = k / n
+            c = tuple(int(a + (b - a) * f) for a, b in zip(c_top, c_bottom))
+            self.d.line([(x0, y0 + k), (x1 - 1, y0 + k)], fill=c)
+        self.md.rectangle([x0, y0, x1 - 1, y1 - 1], fill=(255, 0, 0) if tint else (0, 0, 0))
+
     def slab(self, r, h, face=TOP, wall=WALL, joined=(), tint=True, lit=TOP_LIT, wall_dark=WALL_DARK):
         """A raised part: lit top face over a darker wall LIFT*h deep, lit lip on top.
 
@@ -100,44 +110,93 @@ class Canvas:
         if wall_h:
             self.rect((x0, y1 - wall_h, x1, y1), wall, tint)
             self.rect((x0, y1 - wall_h, x1, y1 - wall_h + 0.006), wall_dark, tint)
-        self.rect((x0, y0, x1, y1 - wall_h), face, tint)
+        if face == TOP and "north" not in joined and "south" not in joined:
+            # Upholstery and tops puff up to the light: a soft ramp down the face,
+            # brightest at the top - VFE's pillowy shading, as tone. Not across a
+            # north/south join, where it would repeat per cell as stripes.
+            self.ramp((x0, y0, x1, y1 - wall_h), TOP_LIT, face, tint)
+        else:
+            self.rect((x0, y0, x1, y1 - wall_h), face, tint)
         if "north" not in joined:
             self.rect((x0, y0, x1, y0 + 0.012), lit, tint)
 
-    def silhouette(self, open_sides, ring=RING):
-        """Black ring on the outer silhouette only.
-
-        Joined sides continue into the neighbouring cell, so the canvas is padded
-        with opaque there and transparent on open sides before eroding: the ring
-        then follows open edges and gaps, never a seam between two pieces.
-        """
+    def _padded_alpha(self, open_sides, pad):
+        """The silhouette, padded by `pad` px: opaque past joined sides (they carry
+        on into the neighbour), transparent past open ones. Every silhouette effect
+        works on this, so none of them ever marks a seam between two pieces."""
         a = self.img.getchannel("A").point(lambda v: 255 if v > 127 else 0)
-        pad = Image.new("L", (C + 2 * RING, C + 2 * RING), 0)
-        pad.paste(a, (RING, RING))
-        pd = ImageDraw.Draw(pad)
-        full = C + 2 * RING - 1
-        if "north" not in open_sides:
-            pd.rectangle([RING, 0, RING + C - 1, RING - 1], fill=255)
-        if "south" not in open_sides:
-            pd.rectangle([RING, RING + C, RING + C - 1, full], fill=255)
-        if "west" not in open_sides:
-            pd.rectangle([0, RING, RING - 1, RING + C - 1], fill=255)
-        if "east" not in open_sides:
-            pd.rectangle([RING + C, RING, full, RING + C - 1], fill=255)
+        P = Image.new("L", (C + 2 * pad, C + 2 * pad), 0)
+        P.paste(a, (pad, pad))
+        d = ImageDraw.Draw(P)
+        full = C + 2 * pad - 1
+        boxes = {"north": [pad, 0, pad + C - 1, pad - 1], "south": [pad, pad + C, pad + C - 1, full],
+                 "west": [0, pad, pad - 1, pad + C - 1], "east": [pad + C, pad, full, pad + C - 1]}
+        for side, box in boxes.items():
+            if side not in open_sides:
+                # Carry the silhouette's own edge on, not a solid block: a joined
+                # side continues whatever touches that edge (a gap between legs
+                # stays a gap).
+                edge = {"north": (0, 0, C, 1), "south": (0, C - 1, C, C),
+                        "west": (0, 0, 1, C), "east": (C - 1, 0, C, C)}[side]
+                strip = a.crop(edge).resize((box[2] - box[0] + 1, box[3] - box[1] + 1))
+                P.paste(strip, (box[0], box[1]))
         # Corners between two joined sides are solid too (a 2x2 block has no hole).
-        for v, hz, box in (("north", "west", [0, 0, RING - 1, RING - 1]),
-                           ("north", "east", [RING + C, 0, full, RING - 1]),
-                           ("south", "west", [0, RING + C, RING - 1, full]),
-                           ("south", "east", [RING + C, RING + C, full, full])):
+        for v, hz, box in (("north", "west", [0, 0, pad - 1, pad - 1]),
+                           ("north", "east", [pad + C, 0, full, pad - 1]),
+                           ("south", "west", [0, pad + C, pad - 1, full]),
+                           ("south", "east", [pad + C, pad + C, full, full])):
             if v not in open_sides and hz not in open_sides:
-                pd.rectangle(box, fill=255)
-        er = pad
+                d.rectangle(box, fill=255)
+        return a, P
+
+    def silhouette(self, open_sides, ring=RING):
+        """Finish a sprite against its silhouette, in the order VFE's furniture
+        reads: rounded outer corners, soft light on the upper-left edges and shade
+        on the lower-right, then the black ring. All three follow OPEN edges and
+        gaps only; joined sides are padded as carrying on, so seams stay clean.
+        """
+        pad = int(0.2 * C)
+        a, P = self._padded_alpha(open_sides, pad)
+        crop = lambda im: im.crop((pad, pad, pad + C, pad + C))
+
+        # 1. Round the outer corners: blur and re-threshold the padded silhouette.
+        # Only ever removes pixels, and a joined side is flat, so it stays square.
+        rounded = crop(P.filter(ImageFilter.GaussianBlur(int(0.035 * C))).point(
+            lambda v: 255 if v > 150 else 0))
+        cut = ImageChops.subtract(a, rounded)
+        if cut.getbbox():
+            clear = Image.new("RGBA", (C, C), (0, 0, 0, 0))
+            self.img.paste(clear, (0, 0), cut)
+            self.mask.paste((0, 0, 0), (0, 0), cut)
+            a = ImageChops.multiply(a, rounded)
+            _, P = self._padded_alpha(open_sides, pad)
+
+        # 2. Edge light: inside the silhouette, near an edge that faces up-left,
+        # lift towards white; near one facing down-right, sink towards black.
+        # Soft, a tenth of a cell deep - VFE's airbrushed rim, as tone not line.
+        dd = int(0.10 * C)
+        blur = ImageFilter.GaussianBlur(int(0.05 * C))
+        up_left = P.transform(P.size, Image.AFFINE, (1, 0, -dd, 0, 1, -dd))     # P(x-d, y-d)
+        down_right = P.transform(P.size, Image.AFFINE, (1, 0, dd, 0, 1, dd))    # P(x+d, y+d)
+        inv = lambda im: im.point(lambda v: 255 - v)
+        light = crop(ImageChops.multiply(P, inv(up_left)).filter(blur))
+        shade = crop(ImageChops.multiply(P, inv(down_right)).filter(blur))
+        light = ImageChops.multiply(light, a).point(lambda v: int(v * 0.30))
+        shade = ImageChops.multiply(shade, a).point(lambda v: int(v * 0.22))
+        rgb = self.img.convert("RGB")
+        rgb = Image.composite(Image.new("RGB", (C, C), (255, 255, 255)), rgb, light)
+        rgb = Image.composite(Image.new("RGB", (C, C), (0, 0, 0)), rgb, shade)
+        rgb.putalpha(self.img.getchannel("A"))
+        self.img = rgb
+        self.d = ImageDraw.Draw(self.img)
+
+        # 3. The black ring.
+        er = P
         for _ in range(ring):
             er = er.filter(ImageFilter.MinFilter(3))
-        er = er.crop((RING, RING, RING + C, RING + C))
-        ring = ImageChops.subtract(a, er)
+        ring_px = ImageChops.subtract(a, crop(er))
         black = Image.new("RGBA", (C, C), BLACK + (255,))
-        self.img.paste(black, (0, 0), ring)
+        self.img.paste(black, (0, 0), ring_px)
 
     def save(self, path, mask_path=None):
         self.img.resize((CELL, CELL), Image.LANCZOS).save(path)

@@ -9,6 +9,8 @@ python3 Source/Art/draw_sprites.py      # every texture and mask
 python3 Source/Art/verify_art.py        # checks the textures against the defs and the C#
 python3 Source/Art/make_about_art.py    # About/Preview.png and About/ModIcon.png
 python3 Source/Art/contact_sheet.py /tmp/sheet.png   # every variant plus assembled layouts
+python3 Source/Art/measure_furniture.py [VFE path]   # style metrics vs Vanilla Furniture Expanded
+python3 Source/Art/compare_vfe.py /tmp/cmp.png [VFE path]   # side by side with VFE
 ```
 
 All run from the repo root. The rules are the SloppyMods ones settled in the mending, Riimba
@@ -27,6 +29,39 @@ and TrashPower art (see their `Source/Art/README.md`):
   `Graphic_Single` mask is `<name>_m.png`, and a `Graphic_Multi` mask is `<name>_<rot>m.png`
   with no underscore. The table is stuff all the way through, so it uses `Cutout` and has no mask.
 * **Supersampled** at 4x and reduced with LANCZOS. One cell is 192px.
+
+## Measured against Vanilla Furniture Expanded
+
+Furniture sits beside VFE's in most modlists, so it is measured against VFE's furniture
+textures. `measure_furniture.py` scores the grey, stuff-tinted faces of every sprite, and
+`compare_vfe.py` renders the two side by side at the same scale and stuff colours. Both need a
+VFE checkout.
+
+| | before | after | VFE median | VFE range |
+| --- | --- | --- | --- | --- |
+| grey face luminance (median) | 228 | 223 | 218 | 83-253 |
+| highlight (p90) | 228 | 237 | 245 | 170-255 |
+| tonal contrast (std) | 29.2 | 32.5 | 31.8 | 4-56 |
+| outline width (% of a cell) | 1.3 | 2.3 | 2.7 | 0-4.6 |
+| distinct grey levels | 47 | 84 | 83 | 12-108 |
+
+What the pass changed, all in `Canvas.silhouette`, so every piece got it at once:
+
+* **Outline 4px to 7px at 192px a cell.** Ours was half VFE's weight and vanished at play
+  zoom. Thin parts are scaled to match: the chairs 5px, the rug 4px.
+* **Rounded outer corners.** VFE rounds every silhouette corner, and square corners were
+  what made ours read as boxes.
+* **Edge light.** A soft lift towards white just inside up-left-facing edges, and a sink
+  towards black inside down-right ones. This is VFE's airbrushed rim, done as tone and not
+  as a line. It is what doubled the grey levels.
+* **Faces ramp.** A top face puffs up to the light, brightest at the top. This lifts the
+  highlights and makes upholstery read soft.
+* **Chunkier legs** on the table and desk, and lighter cubby and bookcase interiors.
+
+All of these follow open edges only. The silhouette is padded as carrying on past a joined
+side, so a seam between two pieces never gets a rim, a rounded corner or an outline. The
+ramp is skipped across north/south joins, where it would repeat per cell as stripes.
+`verify_art.py` still checks every joined edge.
 
 ## Pieces that join up are drawn as variants
 
