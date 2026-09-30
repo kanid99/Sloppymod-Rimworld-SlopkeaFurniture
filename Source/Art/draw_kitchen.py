@@ -22,8 +22,6 @@ CCW = {v: k for k, v in CW.items()}
 STONE_LIT, STONE, STONE_EDGE = (236, 234, 228), (218, 215, 208), (176, 172, 164)
 STEEL_LIT, STEEL, STEEL_DARK = (214, 220, 226), (172, 180, 188), (104, 110, 118)
 BURNER, BURNER_RING = (40, 40, 42), (84, 84, 88)
-BOOK_SPINES = [(150, 60, 60), (60, 90, 140), (80, 130, 80), (190, 160, 70),
-               (120, 80, 140), (200, 120, 60), (70, 70, 70)]
 
 
 def kitchen_path(module, facing, cw, ccw, mask=False):
@@ -31,7 +29,14 @@ def kitchen_path(module, facing, cw, ccw, mask=False):
 
 
 def book_path(facing, cw, ccw, mask=False):
-    return f"{BOOK_DIR}/Slopkea_Bookcase_{facing}_{cw}{ccw}{'_m' if mask else ''}.png"
+    """Named <cw><ccw>_<facing>, unlike the rest: the bookcase keeps the vanilla
+    Building_Bookcase and swaps its Graphic for a Graphic_Multi per join state, and
+    Graphic_Multi appends _<facing> (and "m", no underscore, for the mask)."""
+    return f"{BOOK_DIR}/Slopkea_Bookcase_{cw}{ccw}_{facing}{'m' if mask else ''}.png"
+
+
+BOOKEND_EAST = BOOK_DIR + "/Slopkea_BookendEast.png"
+BOOKEND_NORTH = BOOK_DIR + "/Slopkea_BookendNorth.png"
 
 
 def joined_sides(facing, cw, ccw):
@@ -115,8 +120,9 @@ def draw_kitchen(module, facing, cw, ccw):
 
 
 def draw_bookcase(facing, cw, ccw):
-    """A BILLY-style bookcase: tall, three shelves, drawn as a view. Books on the
-    shelves are painted in (and untinted); stored books sit in front of them."""
+    """A BILLY-style bookcase, drawn EMPTY: the vanilla bookcase code fills the
+    shelves with the books actually stored in it. Tall, three shelves, a view per
+    facing."""
     joined = joined_sides(facing, cw, ccw)
     open_sides = set(SIDES) - joined
     cv = Canvas()
@@ -125,17 +131,10 @@ def draw_bookcase(facing, cw, ccw):
         cv.rect((0, 0.02, 1, 0.98), TOP)
         cv.rect((0, 0.02, 1, 0.08), TOP_LIT)
         x0, x1 = w("west"), 1 - w("east")
-        for k, (y0, y1) in enumerate(((0.11, 0.37), (0.40, 0.66), (0.69, 0.94))):
-            cv.rect((x0, y0, x1, y1), WALL_DARK)
-            cv.rect((x0, y0, x1, y0 + 0.035), (70, 70, 70))
-            x = x0 + 0.02
-            n = 0
-            while x < x1 - 0.12 + 0.04 * (k % 2):
-                bw = 0.045 + 0.012 * ((n * 7 + k) % 3)
-                top = y0 + 0.05 + 0.03 * ((n * 5 + k) % 3)
-                cv.rect((x, top, x + bw, y1), BOOK_SPINES[(n + 2 * k) % len(BOOK_SPINES)], tint=False)
-                x += bw + 0.006
-                n += 1
+        for y0, y1 in ((0.11, 0.37), (0.40, 0.66), (0.69, 0.94)):
+            cv.rect((x0, y0, x1, y1), WALL_DARK)                # the back panel, in shade
+            cv.rect((x0, y0, x1, y0 + 0.035), (96, 96, 96))     # under the shelf above
+            cv.rect((x0, y1 - 0.02, x1, y1), WALL)              # the shelf's lit front lip
     elif facing == "north":
         cv.rect((0, 0.02, 1, 0.98), TOP)
         cv.rect((0, 0.02, 1, 0.08), TOP_LIT)
@@ -150,17 +149,22 @@ def draw_bookcase(facing, cw, ccw):
             cv.rect((0.06, y0, 0.94, y0 + 0.03), TOP_LIT)
         if "south" not in joined:
             cv.rect((0.06, y1 - 0.06, 0.94, y1), WALL)
-        fx0, fx1 = (0.72, 0.94) if right else (0.06, 0.28)       # book tops along the open front
+        fx0, fx1 = (0.72, 0.94) if right else (0.06, 0.28)       # the open front, empty
         ya, yb = y0 + w("north"), y1 - w("south") - (0.06 if "south" not in joined else 0)
-        y = ya
-        n = 0
-        while y < yb - 0.04:
-            bh = 0.05 + 0.012 * (n % 3)
-            cv.rect((fx0, y, fx1 - 0.02 * (n % 2), min(y + bh, yb)), BOOK_SPINES[n % len(BOOK_SPINES)], tint=False)
-            y += bh + 0.006
-            n += 1
+        cv.rect((fx0, ya, fx1, yb), WALL_DARK)
     cv.silhouette(open_sides)
     cv.save(book_path(facing, cw, ccw), book_path(facing, cw, ccw, True))
+
+
+def draw_bookends():
+    """The small steel bookends vanilla's bookcase stands at the end of a row."""
+    for path, (w, h) in ((BOOKEND_EAST, (0.5, 0.9)), (BOOKEND_NORTH, (0.9, 0.5))):
+        cv = Canvas()
+        x0, y0 = (1 - w) / 2, (1 - h) / 2
+        cv.rect((x0, y0, x0 + w, y0 + h), STEEL, tint=False)
+        cv.rect((x0, y0, x0 + w, y0 + min(w, h) * 0.2), STEEL_LIT, tint=False)
+        cv.silhouette(set(SIDES))
+        cv.save(path)
 
 
 def draw_all():
@@ -179,3 +183,4 @@ def draw_all():
             shutil.copy(kitchen_path(m, f, "o", "o", True), f"{KITCHEN_DIR}/Slopkea_{m}_{f}m.png")
         shutil.copy(book_path(f, "o", "o"), f"{BOOK_DIR}/Slopkea_Bookcase_{f}.png")
         shutil.copy(book_path(f, "o", "o", True), f"{BOOK_DIR}/Slopkea_Bookcase_{f}m.png")
+    draw_bookends()

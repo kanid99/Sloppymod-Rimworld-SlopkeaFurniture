@@ -122,8 +122,12 @@ mix them in any order.
   open end.
 * **Doors are recessed panels,** made of tone steps and never outlined. Side views show the
   doors edge-on.
-* **The bookcase's painted books are untinted,** so the stuff colours only the case. Stored
-  books are drawn by the game in front of them.
+* **The bookcase is drawn empty.** It is vanilla's `Building_Bookcase`, which draws the
+  books actually stored in it, in real time, over the case. The subclass only overrides
+  `Graphic` with a `Graphic_Multi` per join state. That is why its files are named
+  `Slopkea_Bookcase_<cw><ccw>_<facing>` (`Graphic_Multi` appends the facing), and why the
+  def is `MapMeshAndRealTime`. `Slopkea_BookendEast` and `Slopkea_BookendNorth` are the
+  bookends vanilla stands at the end of a row.
 
 Rotation is the way the **front** faces, as for every Slopkea piece. That is the opposite of
 vanilla workbenches, whose rotation is the way the worker faces, so the hob's

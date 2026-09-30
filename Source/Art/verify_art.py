@@ -132,10 +132,14 @@ for f in FACINGS:
                 check(os.path.exists(m), f"missing {m}")
                 check_edges(p, {"north", "east", "south", "west"} - joined)
 kr = open("Source/SlopkeaFurniture/KitchenRun.cs").read()
-for prefix, sample in (('Dir = "', dk.kitchen_path("Cabinet", "north", "o", "o")),
-                       ('Bookcase = "', dk.book_path("north", "o", "o"))):
-    got = kr.split(prefix, 1)[1].split('"', 1)[0]
-    check(sample.startswith("Textures/" + got), f"KitchenRun.cs: {got} does not match {sample}")
+got = kr.split('Dir = "', 1)[1].split('"', 1)[0]
+check(dk.kitchen_path("Cabinet", "north", "o", "o").startswith("Textures/" + got), f"KitchenRun.cs: bad Dir {got}")
+bc = open("Source/SlopkeaFurniture/Building_SlopkeaBookcase.cs").read()
+got = bc.split('TexPrefix = "', 1)[1].split('"', 1)[0]
+# The bookcase builds <prefix><cw><ccw> and Graphic_Multi appends _<facing>.
+check(dk.book_path("north", "o", "j") == f"Textures/{got}oj_north.png", f"bookcase prefix {got} vs {dk.book_path('north', 'o', 'j')}")
+for p in (dk.BOOKEND_EAST, dk.BOOKEND_NORTH):
+    check(os.path.exists(p), f"missing {p}")
 for mod in dk.MODULES:
     check(f'KitchenPaths.Dir + "{mod}_"' in kr, f"KitchenRun.cs: no print path for {mod}")
 

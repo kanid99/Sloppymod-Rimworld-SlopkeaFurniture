@@ -39,11 +39,10 @@ namespace SlopkeaFurniture
         public static bool IsKitchen(Thing t) => t is ISlopkeaKitchenModule;
     }
 
-    // Must match Source/Art/draw_kitchen.py (kitchen_path, book_path).
+    // Must match Source/Art/draw_kitchen.py (kitchen_path).
     internal static class KitchenPaths
     {
         public const string Dir = "Things/Building/Furniture/Slopkea/Kitchen/Slopkea_";
-        public const string Bookcase = "Things/Building/Furniture/Slopkea/Bookcase/Slopkea_Bookcase_";
     }
 
     /// <summary>Kitchen cabinet: a worktop over cupboards that store food.</summary>
@@ -107,26 +106,5 @@ namespace SlopkeaFurniture
 
         public override void Print(SectionLayer layer) =>
             SideJoin.Print(layer, this, KitchenPaths.Dir + "Hob_", SideJoin.IsKitchen);
-    }
-
-    /// <summary>BILLY-style bookcase: books-only storage; units facing the same way join into a run.</summary>
-    public class Building_SlopkeaBookcase : Building_Storage
-    {
-        public override void SpawnSetup(Map map, bool respawningAfterLoad)
-        {
-            base.SpawnSetup(map, respawningAfterLoad);
-            Neighbors.DirtyAround(map, Position);
-        }
-
-        public override void DeSpawn(DestroyMode mode = DestroyMode.Vanish)
-        {
-            Map map = Map;
-            IntVec3 pos = Position;
-            base.DeSpawn(mode);
-            Neighbors.DirtyAround(map, pos);
-        }
-
-        public override void Print(SectionLayer layer) =>
-            SideJoin.Print(layer, this, KitchenPaths.Bookcase, t => t.def == def);
     }
 }

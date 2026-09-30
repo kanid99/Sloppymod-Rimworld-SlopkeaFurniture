@@ -10,7 +10,7 @@ Flat-pack, IKEA-inspired furniture for RimWorld 1.6. Some assembly required.
 - **KUBBLÅ cube shelf** – rotatable storage, two stacks per unit; units facing the same way join into one run.
 - **MATTBIT rug segment** – drag out any rug shape; the border follows the outline, and furniture stands on it.
 - **SKÅPKÖK kitchen run** – cabinet (stores food), sink (room cleanliness) and hob (electric stove; cooks everything the vanilla electric stove does, via `Patches/Slopkea_HobRecipes.xml`). Any modules facing the same way join into one counter.
-- **HYLLVIK bookcase** – books-only storage, three stacks per unit; units facing the same way join into a run.
+- **HYLLVIK bookcase** – a vanilla bookcase (`Building_Bookcase`: holds, shows and lends out books, reading bonus) with empty shelves; vanilla fills them with whatever books are stored. Units facing the same way join into a run.
 - **GLÖMSTRÄK table segment** – 1x1 dining-table panels placed with an area drag. Adjacent panels merge: rim only on exposed sides, legs only on outside corners. Any shape works and every cell is an eating surface.
 
 ## Layout

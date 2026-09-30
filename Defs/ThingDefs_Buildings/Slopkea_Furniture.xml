@@ -444,12 +444,16 @@
     </comps>
   </ThingDef>
 
-  <!-- BILLY-ish: HYLLVIK bookcase. Units facing the same way join into a run. -->
+  <!-- BILLY-ish: HYLLVIK bookcase. A vanilla bookcase in every respect but its
+       looks: it holds, shows and lends out books the vanilla way, and units facing
+       the same way join into one run. -->
   <ThingDef ParentName="SlopkeaFurnitureBase">
     <defName>Slopkea_Bookcase</defName>
     <label>HYLLVIK bookcase</label>
-    <description>A tall bookcase, three shelves deep in books. Line them up and they join into one long wall of books. Stores books only; the paperbacks painted on the shelves are for show.</description>
+    <description>A tall bookcase with three empty shelves, waiting for books. Line them up and they join into one long wall of shelving. Works just like any bookcase: books kept here are shown on the shelves and help readers in the room.</description>
     <thingClass>SlopkeaFurniture.Building_SlopkeaBookcase</thingClass>
+    <!-- Map mesh for the case, real time for vanilla's book drawing. -->
+    <drawerType>MapMeshAndRealTime</drawerType>
     <graphicData>
       <texPath>Things/Building/Furniture/Slopkea/Bookcase/Slopkea_Bookcase</texPath>
       <graphicClass>Graphic_Multi</graphicClass>
@@ -464,7 +468,6 @@
     <fillPercent>0.6</fillPercent>
     <castEdgeShadows>true</castEdgeShadows>
     <staticSunShadowHeight>0.6</staticSunShadowHeight>
-    <surfaceType>Item</surfaceType>
     <canOverlapZones>false</canOverlapZones>
     <stuffCategories>
       <li>Woody</li>
@@ -477,16 +480,24 @@
       <WorkToBuild>700</WorkToBuild>
       <Mass>10</Mass>
       <Flammability>1.0</Flammability>
-      <Beauty>3</Beauty>
+      <Beauty>2</Beauty>
     </statBases>
     <inspectorTabs>
+      <li>ITab_ContentsBooks</li>
       <li>ITab_Storage</li>
     </inspectorTabs>
     <building>
-      <preventDeteriorationOnTop>true</preventDeteriorationOnTop>
-      <ignoreStoredThingsBeauty>true</ignoreStoredThingsBeauty>
-      <maxItemsInCell>3</maxItemsInCell>
-      <blueprintClass>Blueprint_Storage</blueprintClass>
+      <maxItemsInCell>4</maxItemsInCell>
+      <bookendGraphicEast>
+        <texPath>Things/Building/Furniture/Slopkea/Bookcase/Slopkea_BookendEast</texPath>
+        <graphicClass>Graphic_Single</graphicClass>
+        <drawSize>(0.25,0.25)</drawSize>
+      </bookendGraphicEast>
+      <bookendGraphicNorth>
+        <texPath>Things/Building/Furniture/Slopkea/Bookcase/Slopkea_BookendNorth</texPath>
+        <graphicClass>Graphic_Single</graphicClass>
+        <drawSize>(0.25,0.25)</drawSize>
+      </bookendGraphicNorth>
       <fixedStorageSettings>
         <filter>
           <categories>
