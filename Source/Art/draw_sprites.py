@@ -1,6 +1,6 @@
 """Draws every Slopkea texture. Run from the repo root: python3 Source/Art/draw_sprites.py
 
-Both pieces join up with their neighbours, and a building's texture is baked
+The joining pieces join up with their neighbours, and a building's texture is baked
 into the map mesh, so each one is drawn as a set of per-cell VARIANTS rather
 than as overlays turned on the fly. The C# picks the variant from its
 neighbours; verify_art.py checks the two agree.
@@ -386,7 +386,10 @@ def main():
         for facing in FACINGS:
             draw_rocking_chair(kind, facing)
         mirror_east_to_west(kind)
-    print("drew 16 table and 36 sectional variants, 2 rocking chairs")
+    import draw_modular
+    rugs = draw_modular.draw_all()
+    print(f"drew 16 table and 36 sectional variants, 2 rocking chairs, "
+          f"16 desk, {rugs} rug and 16 shelf variants")
 
 
 if __name__ == "__main__":

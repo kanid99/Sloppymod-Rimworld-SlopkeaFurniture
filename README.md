@@ -6,6 +6,9 @@ Flat-pack, IKEA-inspired furniture for RimWorld 1.6. Some assembly required.
 - **Everything is stuffable.** All Slopkea pieces inherit `SlopkeaFurnitureBase` and take stuff.
 - **BÖRKSTÅD sectional seat** – 1x1 rotatable seats (fabric, leather, wood, metal, stone). Drag a line of them; backrests follow facing, armrests appear at open ends, and a seat whose front neighbour turns 90° gets a wrap-around corner backrest. Sittable, so they work as dining chairs.
 - **GUNGVIK rocking chairs** – a spindle-back wooden rocker on curved runners (any wood), which tips on its runners while someone sits in it; and an overstuffed glider rocker (fabric or leather over a white painted frame, plus 25 wood), which glides back and forth.
+- **LÅNGBORD desk segment** – drag out any desk shape; every cell is a research bench worked from its front.
+- **KUBBLÅ cube shelf** – rotatable storage, two stacks per unit; units facing the same way join into one run.
+- **MATTBIT rug segment** – drag out any rug shape; the border follows the outline, and furniture stands on it.
 - **GLÖMSTRÄK table segment** – 1x1 dining-table panels placed with an area drag. Adjacent panels merge: rim only on exposed sides, legs only on outside corners. Any shape works and every cell is an eating surface.
 
 ## Layout

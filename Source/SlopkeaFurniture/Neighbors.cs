@@ -18,6 +18,17 @@ namespace SlopkeaFurniture
             return null;
         }
 
+        /// <summary>Bit set per side with a matching neighbour: N=1, E=2, S=4, W=8.</summary>
+        public static int JoinedBits<T>(Thing self) where T : Thing
+        {
+            int i = 0;
+            for (int r = 0; r < 4; r++)
+            {
+                if (Get<T>(self, new Rot4(r).FacingCell) != null) i |= 1 << r;
+            }
+            return i;
+        }
+
         /// <summary>Force the surrounding cells to re-print so their joins update.</summary>
         public static void DirtyAround(Map map, IntVec3 center)
         {

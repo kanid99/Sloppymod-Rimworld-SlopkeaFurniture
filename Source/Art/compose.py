@@ -44,17 +44,59 @@ def tinted(path, color, mask_path=None):
     return mult
 
 
-def render(scene, colors, size, cell_px=CELL, bg=(92, 84, 72)):
-    """scene: {(x, z): ("table",) | ("sect", facing)}, z up. size in cells."""
+def bits_index(cells, cell):
+    """Mirror of Neighbors.JoinedBits: N=1, E=2, S=4, W=8 for each joined side."""
+    return sum(b for side, b in BITS.items() if step(cell, side) in cells)
+
+
+def rug_corners(cells, cell):
+    """Mirror of Building_SlopkeaRug.CornerBits."""
+    from draw_modular import CORNERS
+    c = 0
+    for s1, s2, bit in CORNERS.values():
+        a, b = step(cell, s1), step(cell, s2)
+        diag = step(a, s2)
+        if a in cells and b in cells and diag not in cells:
+            c |= bit
+    return c
+
+
+def shelf_states(scene, cell):
+    """Mirror of Building_SlopkeaShelf.SideState, for (cw, ccw)."""
+    facing = scene[cell][1]
+    out = []
+    for side in (CW[facing], CCW[facing]):
+        n = scene.get(step(cell, side))
+        out.append("j" if n and n[0] == "shelf" and n[1] == facing else "o")
+    return tuple(out)
+
+
+def render(scene, colors, size, cell_px=CELL, bg=(92, 84, 72), rugs=()):
+    """scene: {(x, z): ("table",) | ("desk",) | ("sect", facing) | ("shelf", facing)},
+    z up; rugs: a set of cells, drawn underneath. size in cells."""
+    from draw_modular import desk_path, rug_path, shelf_path
     w, h = size
     out = Image.new("RGBA", (w * cell_px, h * cell_px), bg + (255,))
+    rugs = set(rugs)
+    tiles = [((x, z), tinted(rug_path(bits_index(rugs, (x, z)), rug_corners(rugs, (x, z))),
+                             colors.get("rug", (160, 60, 50)))) for x, z in rugs]
+    same = lambda kind: {c for c, t in scene.items() if t[0] == kind}
     for (x, z), thing in scene.items():
         if thing[0] == "table":
             tile = tinted(table_path(table_index(scene, (x, z))), colors["table"])
+        elif thing[0] == "desk":
+            i = bits_index(same("desk"), (x, z))
+            tile = tinted(desk_path(i), colors.get("desk", (235, 232, 222)), desk_path(i, True))
+        elif thing[0] == "shelf":
+            cw, ccw = shelf_states(scene, (x, z))
+            tile = tinted(shelf_path(thing[1], cw, ccw), colors.get("shelf", (240, 240, 236)),
+                          shelf_path(thing[1], cw, ccw, True))
         else:
             cw, ccw = sectional_states(scene, (x, z))
             tile = tinted(sect_path(thing[1], cw, ccw), colors["sect"],
                           sect_path(thing[1], cw, ccw, mask=True))
+        tiles.append(((x, z), tile))
+    for (x, z), tile in tiles:
         if cell_px != CELL:
             tile = tile.resize((cell_px, cell_px), Image.LANCZOS)
         out.alpha_composite(tile, (x * cell_px, (h - 1 - z) * cell_px))

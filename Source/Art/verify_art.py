@@ -48,9 +48,15 @@ def check_edges(path, open_sides):
             b = black_share(px)
             check(b is None or b > 0.9, f"{path}: open {side} edge has no silhouette ring")
         else:
-            # Joined: no black - it continues into the neighbour. (It need not be
-            # solid: the gap between a table's legs runs on under a joined side.)
-            check((black_share(px) or 0) < 0.02, f"{path}: joined {side} edge has a black ring")
+            # Joined: no outline running ALONG the edge - it continues into the
+            # neighbour. An outline crossing it (the bottom of an apron) is fine, so
+            # this looks for a long black run down the edge, not any black at all.
+            # (It need not be solid: the gap between legs runs on under a join.)
+            run = best = 0
+            for p in edge_pixels(im, side, depth=1):
+                run = run + 1 if p[3] > 200 and max(p[:3]) < 40 else 0
+                best = max(best, run)
+            check(best < 12, f"{path}: joined {side} edge has a black ring ({best}px run)")
 
 
 # Textures vs the variant rules.
@@ -93,6 +99,28 @@ for kind in ROCKER_KINDS:
                 share = sum(r and s_ for r, s_ in zip(reds, solid)) / max(1, sum(solid))
                 check(0.15 < share < 0.8, f"{m}: {share:.0%} of the chair tinted, want upholstery only")
 
+# Desk, rug and shelf: the same open/joined edge contract.
+import draw_modular as dm
+for i in range(16):
+    open_s = {s_ for s_, b in BITS.items() if not i & b}
+    check_edges(dm.desk_path(i), open_s)
+    check(os.path.exists(dm.desk_path(i, True)), f"missing {dm.desk_path(i, True)}")
+n_rug = 0
+for i, c in dm.rug_variants():
+    p = dm.rug_path(i, c)
+    check(os.path.exists(p), f"missing {p}")
+    if os.path.exists(p):
+        check_edges(p, {s_ for s_, b in BITS.items() if not i & b})
+    n_rug += 1
+check(n_rug == 47, f"{n_rug} rug variants, expected 47")
+for f in FACINGS:
+    for cw in "oj":
+        for ccw in "oj":
+            p = dm.shelf_path(f, cw, ccw)
+            check(os.path.exists(dm.shelf_path(f, cw, ccw, True)), f"missing mask for {p}")
+            joined = {s_ for s_, st in ((CW[f], cw), (CCW[f], ccw)) if st == "j"}
+            check_edges(p, {"north", "east", "south", "west"} - joined)
+
 # Joined edges carry on into the neighbour: the two edges that meet must match.
 def edge_mean(path, side):
     px = edge_pixels(Image.open(path).convert("RGBA"), side, 1)
@@ -120,7 +148,10 @@ for td in root.iter("ThingDef"):
 
 # Textures vs the C#: the path prefixes the code builds must be the art's.
 for cs, sample in (("Building_SlopkeaTable.cs", table_path(0)),
-                   ("Building_SlopkeaSectional.cs", sect_path("north", "a", "a"))):
+                   ("Building_SlopkeaSectional.cs", sect_path("north", "a", "a")),
+                   ("Building_SlopkeaDesk.cs", dm.desk_path(0)),
+                   ("Building_SlopkeaRug.cs", dm.rug_path(0, 0)),
+                   ("Building_SlopkeaShelf.cs", dm.shelf_path("north", "o", "o"))):
     src = open("Source/SlopkeaFurniture/" + cs).read()
     prefix = re.search(r'TexPrefix = "([^"]+)"', src).group(1)
     check(sample.startswith("Textures/" + prefix), f"{cs}: TexPrefix {prefix} does not match {sample}")
@@ -130,4 +161,4 @@ check('"north", "east", "south", "west"' in src, "sectional facing names out of 
 if errors:
     print("\n".join(errors))
     sys.exit(1)
-print("art ok: 16 table variants, 36 sectional variants + masks, 2 rocking chairs; defs and C# agree")
+print("art ok: table, sectional, rocking chairs, desk, rug (47) and shelf variants; defs and C# agree")

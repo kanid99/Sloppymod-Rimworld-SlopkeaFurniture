@@ -165,4 +165,145 @@
     </statBases>
   </ThingDef>
 
+  <!-- LÅNGBORD: one cell of a drag-to-shape desk. Each cell is a research bench. -->
+  <ThingDef ParentName="SlopkeaFurnitureBase">
+    <defName>Slopkea_Desk</defName>
+    <label>LÅNGBORD desk segment</label>
+    <description>A flat-pack desk panel. Drag out any shape - a long bench, an L, a U around a very important chair - and neighbouring panels join into one desk. Every panel is a research spot, worked from its front.</description>
+    <thingClass>SlopkeaFurniture.Building_SlopkeaDesk</thingClass>
+    <graphicData>
+      <texPath>Things/Building/Furniture/Slopkea/Desk/Slopkea_Desk_0</texPath>
+      <graphicClass>Graphic_Single</graphicClass>
+      <shaderType>CutoutComplex</shaderType>
+      <drawSize>(1,1)</drawSize>
+    </graphicData>
+    <placingDraggableDimensions>2</placingDraggableDimensions>
+    <rotatable>true</rotatable>
+    <defaultPlacingRot>North</defaultPlacingRot>
+    <hasInteractionCell>true</hasInteractionCell>
+    <interactionCellOffset>(0,0,-1)</interactionCellOffset>
+    <passability>PassThroughOnly</passability>
+    <pathCost>42</pathCost>
+    <fillPercent>0.4</fillPercent>
+    <castEdgeShadows>true</castEdgeShadows>
+    <staticSunShadowHeight>0.20</staticSunShadowHeight>
+    <surfaceType>Item</surfaceType>
+    <stuffCategories>
+      <li>Woody</li>
+      <li>Metallic</li>
+      <li>Stony</li>
+    </stuffCategories>
+    <costStuffCount>20</costStuffCount>
+    <statBases>
+      <MaxHitPoints>60</MaxHitPoints>
+      <WorkToBuild>900</WorkToBuild>
+      <Mass>6</Mass>
+      <Flammability>1.0</Flammability>
+      <Beauty>0.5</Beauty>
+      <ResearchSpeedFactor>0.9</ResearchSpeedFactor>
+    </statBases>
+  </ThingDef>
+
+  <!-- KUBBLÅ: cube shelving. Units facing the same way join into one run. -->
+  <ThingDef ParentName="SlopkeaFurnitureBase">
+    <defName>Slopkea_CubeShelf</defName>
+    <label>KUBBLÅ cube shelf</label>
+    <description>A tower of two cubes. Line them up and they join into one long unit with shared walls. Each cube holds a stack of whatever you ask it to. Fabric bins not included.</description>
+    <thingClass>SlopkeaFurniture.Building_SlopkeaShelf</thingClass>
+    <graphicData>
+      <texPath>Things/Building/Furniture/Slopkea/Shelf/Slopkea_Shelf</texPath>
+      <graphicClass>Graphic_Multi</graphicClass>
+      <shaderType>CutoutComplex</shaderType>
+      <drawSize>(1,1)</drawSize>
+    </graphicData>
+    <placingDraggableDimensions>1</placingDraggableDimensions>
+    <rotatable>true</rotatable>
+    <defaultPlacingRot>South</defaultPlacingRot>
+    <passability>PassThroughOnly</passability>
+    <pathCost>50</pathCost>
+    <fillPercent>0.5</fillPercent>
+    <castEdgeShadows>true</castEdgeShadows>
+    <staticSunShadowHeight>0.5</staticSunShadowHeight>
+    <surfaceType>Item</surfaceType>
+    <canOverlapZones>false</canOverlapZones>
+    <stuffCategories>
+      <li>Woody</li>
+      <li>Metallic</li>
+      <li>Stony</li>
+    </stuffCategories>
+    <costStuffCount>25</costStuffCount>
+    <statBases>
+      <MaxHitPoints>80</MaxHitPoints>
+      <WorkToBuild>600</WorkToBuild>
+      <Mass>8</Mass>
+      <Flammability>1.0</Flammability>
+      <Beauty>0.5</Beauty>
+    </statBases>
+    <inspectorTabs>
+      <li>ITab_Storage</li>
+    </inspectorTabs>
+    <building>
+      <preventDeteriorationOnTop>true</preventDeteriorationOnTop>
+      <ignoreStoredThingsBeauty>true</ignoreStoredThingsBeauty>
+      <maxItemsInCell>2</maxItemsInCell>
+      <blueprintClass>Blueprint_Storage</blueprintClass>
+      <fixedStorageSettings>
+        <filter>
+          <categories>
+            <li>Root</li>
+          </categories>
+        </filter>
+      </fixedStorageSettings>
+      <defaultStorageSettings>
+        <priority>Preferred</priority>
+        <filter>
+          <categories>
+            <li>Manufactured</li>
+            <li>ResourcesRaw</li>
+            <li>Items</li>
+            <li>Weapons</li>
+            <li>Apparel</li>
+          </categories>
+        </filter>
+      </defaultStorageSettings>
+    </building>
+  </ThingDef>
+
+  <!-- MATTBIT: one cell of a drag-to-shape rug. Furniture stands on it. -->
+  <ThingDef ParentName="SlopkeaFurnitureBase">
+    <defName>Slopkea_Rug</defName>
+    <label>MATTBIT rug segment</label>
+    <description>A square of rug. Drag out any shape and the squares join into one rug, with a border that follows the outline and turns every corner. Furniture can stand on it. Vacuuming not included.</description>
+    <thingClass>SlopkeaFurniture.Building_SlopkeaRug</thingClass>
+    <graphicData>
+      <texPath>Things/Building/Furniture/Slopkea/Rug/Slopkea_Rug_0_0</texPath>
+      <graphicClass>Graphic_Single</graphicClass>
+      <drawSize>(1,1)</drawSize>
+    </graphicData>
+    <altitudeLayer>FloorEmplacement</altitudeLayer>
+    <placingDraggableDimensions>2</placingDraggableDimensions>
+    <rotatable>false</rotatable>
+    <passability>Standable</passability>
+    <pathCost>0</pathCost>
+    <fillPercent>0</fillPercent>
+    <castEdgeShadows>false</castEdgeShadows>
+    <staticSunShadowHeight>0</staticSunShadowHeight>
+    <clearBuildingArea>false</clearBuildingArea>
+    <stuffCategories>
+      <li>Fabric</li>
+      <li>Leathery</li>
+    </stuffCategories>
+    <costStuffCount>10</costStuffCount>
+    <statBases>
+      <MaxHitPoints>40</MaxHitPoints>
+      <WorkToBuild>300</WorkToBuild>
+      <Mass>1</Mass>
+      <Flammability>1.0</Flammability>
+      <Beauty>2</Beauty>
+    </statBases>
+    <building>
+      <isEdifice>false</isEdifice>
+    </building>
+  </ThingDef>
+
 </Defs>

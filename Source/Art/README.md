@@ -87,6 +87,28 @@ Parts are round-ended strokes (`Canvas.line`) and polygons. The silhouette ring 
 so the thin turned parts keep some colour inside their outline. `verify_art.py` checks that the
 glider's tinted share is upholstery-sized.
 
+## Desk, rug and cube shelving
+
+Built on the same join scheme, in `draw_modular.py`:
+
+* **Desk:** `Slopkea_Desk_<bits>`, in the table's bit order. It is a smooth slab, not
+  planks. A light edge band runs round every open edge, and slim steel legs sit at the
+  outside corners only. The legs are untinted, so the desk has `_m` masks.
+* **Rug:** `Slopkea_Rug_<bits>_<corners>`. It is flat, so there is no wall, and the
+  silhouette is 2px. The border runs along open sides. An **inside corner** (both sides
+  joined, diagonal empty) also needs the border turning inside this cell, which the side bits
+  alone cannot say. So there are four corner bits: NE=1, SE=2, SW=4, NW=8. Only the 47
+  combinations whose corners have both sides joined are drawn.
+* **Cube shelving:** `Slopkea_Shelf_<facing>_<cw><ccw>`, each side `o` (open) or `j` (joined).
+  Units join only to a neighbour facing the same way. A joined side has half a wall, so a run
+  shows shared walls. South shows the two cubes, north the plain back, and east and west the
+  top with the open front edge-on.
+
+The joined-edge check looks for an outline running *along* a joined edge: a black run of 12px
+or more. An outline *crossing* the edge is legitimate, like the bottom of the desk's front
+band. Painting a black strip down a joined edge makes it fail, which is how the check itself
+was tested.
+
 ## The contract with the C#
 
 `verify_art.py` checks:

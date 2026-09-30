@@ -67,7 +67,29 @@ def main(out):
         for c, f in enumerate(FACINGS):
             m = rocker_path(kind, f, True) if kind == "Cloth" else None
             full.alpha_composite(tinted(rocker_path(kind, f), color, m).resize((T, T)), (10 + c * (T + 4), y2 + r * (T + 4)))
-    full.convert("RGB").save(out)
+    # Desk, rug and shelving, assembled.
+    sc = {}
+    for x in range(1, 5):
+        sc[(x, 6)] = ("shelf", "south")
+    for z in range(3, 6):
+        sc[(0, z)] = ("shelf", "east")
+        sc[(9, z)] = ("shelf", "west")
+    for x in range(6, 9):
+        sc[(x, 6)] = ("shelf", "north")
+    for x in range(3, 7):
+        sc[(x, 2)] = ("desk",)
+    for z in range(0, 2):
+        sc[(6, z)] = ("desk",)
+    sc[(3, 1)] = ("sect", "north")
+    sc[(5, 1)] = ("sect", "north")
+    rugs = {(x, z) for x in range(2, 8) for z in range(3, 6)} | {(8, 4), (8, 5), (2, 2), (2, 1)}
+    mod = render(sc, {"table": WOOD, "sect": FABRIC}, (10, 8), 64, rugs=rugs)
+    y3 = full.height + 20
+    final = Image.new("RGBA", (max(full.width, mod.width + 20), y3 + mod.height + 10), (40, 40, 44, 255))
+    final.alpha_composite(full, (0, 0))
+    ImageDraw.Draw(final).text((10, y3 - 14), "cube shelving (all four facings), L desk, rug with inside corners", fill="white")
+    final.alpha_composite(mod, (10, y3))
+    final.convert("RGB").save(out)
 
 
 if __name__ == "__main__":

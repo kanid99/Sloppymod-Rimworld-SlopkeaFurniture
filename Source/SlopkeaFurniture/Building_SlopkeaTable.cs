@@ -30,12 +30,7 @@ namespace SlopkeaFurniture
         /// <summary>Bit set per joined side: N=1, E=2, S=4, W=8.</summary>
         public int VariantIndex()
         {
-            int i = 0;
-            for (int r = 0; r < 4; r++)
-            {
-                if (Neighbors.Get<Building_SlopkeaTable>(this, new Rot4(r).FacingCell) != null) i |= 1 << r;
-            }
-            return i;
+            return Neighbors.JoinedBits<Building_SlopkeaTable>(this);
         }
 
         public override void Print(SectionLayer layer)
