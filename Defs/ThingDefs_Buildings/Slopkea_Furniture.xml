@@ -98,4 +98,70 @@
     </building>
   </ThingDef>
 
+  <!-- GUNGVIK: rocking chairs. They rock while someone sits in them. -->
+  <ThingDef Name="SlopkeaRockingChairBase" ParentName="SlopkeaFurnitureBase" Abstract="True">
+    <thingClass>SlopkeaFurniture.Building_SlopkeaRockingChair</thingClass>
+    <!-- Real time, not map mesh: the chair moves while it rocks. -->
+    <drawerType>RealtimeOnly</drawerType>
+    <rotatable>true</rotatable>
+    <defaultPlacingRot>South</defaultPlacingRot>
+    <passability>PassThroughOnly</passability>
+    <pathCost>30</pathCost>
+    <fillPercent>0.4</fillPercent>
+    <building>
+      <isSittable>true</isSittable>
+    </building>
+  </ThingDef>
+
+  <ThingDef ParentName="SlopkeaRockingChairBase">
+    <defName>Slopkea_RockingChairWood</defName>
+    <label>GUNGVIK wooden rocking chair</label>
+    <description>A slatted rocking chair, all one wood, with spindles up the back. Rocks gently while someone sits in it. Assembly requires the included hex key and no fewer than three attempts.</description>
+    <graphicData>
+      <texPath>Things/Building/Furniture/Slopkea/RockingChair/Slopkea_RockingChairWood</texPath>
+      <graphicClass>Graphic_Multi</graphicClass>
+      <drawSize>(1,1)</drawSize>
+    </graphicData>
+    <stuffCategories>
+      <li>Woody</li>
+    </stuffCategories>
+    <costStuffCount>50</costStuffCount>
+    <statBases>
+      <MaxHitPoints>70</MaxHitPoints>
+      <WorkToBuild>1100</WorkToBuild>
+      <Mass>6</Mass>
+      <Flammability>1.0</Flammability>
+      <Beauty>3</Beauty>
+      <Comfort>0.7</Comfort>
+    </statBases>
+  </ThingDef>
+
+  <ThingDef ParentName="SlopkeaRockingChairBase">
+    <defName>Slopkea_RockingChairCloth</defName>
+    <label>GUNGVIK upholstered rocking chair</label>
+    <description>A padded rocking chair on an oak frame. The upholstery is whatever fabric or leather it is built from; the frame is always oak. Rocks gently while someone sits in it.</description>
+    <graphicData>
+      <texPath>Things/Building/Furniture/Slopkea/RockingChair/Slopkea_RockingChairCloth</texPath>
+      <graphicClass>Graphic_Multi</graphicClass>
+      <shaderType>CutoutComplex</shaderType>
+      <drawSize>(1,1)</drawSize>
+    </graphicData>
+    <stuffCategories>
+      <li>Fabric</li>
+      <li>Leathery</li>
+    </stuffCategories>
+    <costStuffCount>40</costStuffCount>
+    <costList>
+      <WoodLog>25</WoodLog>
+    </costList>
+    <statBases>
+      <MaxHitPoints>80</MaxHitPoints>
+      <WorkToBuild>1400</WorkToBuild>
+      <Mass>7</Mass>
+      <Flammability>1.0</Flammability>
+      <Beauty>4</Beauty>
+      <Comfort>0.85</Comfort>
+    </statBases>
+  </ThingDef>
+
 </Defs>

@@ -9,11 +9,14 @@ import os
 import shutil
 
 from slopkea_draw import (CCW, CW, OPP, SEAM, TOP, TOP_LIT, WALL, WALL_DARK, FOOT,
+                          OAK, OAK_DARK, OAK_LIT, OAK_WALL,
                           Canvas, local_rect)
 
 ROOT = "Textures/Things/Building/Furniture/Slopkea"
 TABLE_DIR = ROOT + "/Table"
 SECT_DIR = ROOT + "/Sectional"
+ROCKER_DIR = ROOT + "/RockingChair"
+ROCKER_KINDS = ("Wood", "Cloth")
 
 # Table variant index: bit set = a table segment is joined on that side.
 # Same bit order as the TrashPower pipe atlas: N=1, E=2, S=4, W=8.
@@ -137,8 +140,63 @@ def draw_sectional(facing, cw, ccw):
     cv.save(sect_path(facing, cw, ccw), sect_path(facing, cw, ccw, mask=True))
 
 
+def rocker_path(kind, facing, mask=False):
+    return f"{ROCKER_DIR}/Slopkea_RockingChair{kind}_{facing}{'m' if mask else ''}.png"
+
+
+def draw_rocking_chair(kind, facing):
+    """A rocking chair, laid out in its own frame (a across, f front to back).
+
+    Wood: the stuff is the whole chair. Cloth: the stuff is the upholstery only,
+    on a fixed oak frame, so the frame is black in the mask.
+    """
+    cloth = kind == "Cloth"
+    frame = dict(face=OAK, wall=OAK_WALL, lit=OAK_LIT, wall_dark=OAK_DARK, tint=False) if cloth else {}
+    cv = Canvas()
+    L = lambda a0, a1, f0, f1: local_rect(facing, a0, a1, f0, f1)
+
+    parts = []
+    # Rockers: two long runners, past the seat both ways - the thing that says "rocking".
+    # Each runner tapers to half width over its last tenth at both tips, so it
+    # reads as a curve lifting off the floor rather than a plank.
+    for a0, a1 in ((0.2, 0.27), (0.73, 0.8)):
+        mid = (a0 + a1) / 2
+        parts.append((L(a0, a1, 0.12, 0.88), 0.03, "rocker"))
+        for f0, f1 in ((0.03, 0.12), (0.88, 0.97)):
+            parts.append((L(mid - 0.018, mid + 0.018, f0, f1), 0.02, "rocker"))
+    parts.append((L(0.27, 0.73, 0.22, 0.74), 0.12, "seat"))
+    for a0, a1 in ((0.24, 0.31), (0.69, 0.76)):
+        parts.append((L(a0, a1, 0.26, 0.74), 0.24, "arm"))
+    parts.append((L(0.25, 0.75, 0.74, 0.88), 0.4, "back"))
+    parts.sort(key=lambda p: (p[2] != "rocker", p[0][3], p[1]))
+
+    for r, h, name in parts:
+        if name == "rocker":
+            cv.slab(r, h, **(frame or dict(face=WALL, wall=WALL_DARK)))
+            continue
+        if name == "seat":
+            cv.slab(r, h, **frame)
+            if cloth:
+                cv.slab(L(0.32, 0.68, 0.25, 0.72), 0.05)          # seat cushion
+            else:
+                for f in (0.33, 0.46, 0.59):                       # slats
+                    cv.rect(L(0.27, 0.73, f - 0.005, f + 0.005), SEAM)
+        elif name == "arm":
+            cv.slab(r, h, **frame)
+        elif name == "back":
+            cv.slab(r, h, **frame)
+            if cloth:
+                cv.slab(L(0.3, 0.7, 0.755, 0.865), 0.08)        # padded back
+            else:
+                for a in (0.35, 0.45, 0.55, 0.65):                 # spindles
+                    x0, y0, x1, y1 = L(a - 0.012, a + 0.012, 0.755, 0.865)
+                    cv.rect((x0, y0, x1, y1), SEAM)
+    cv.silhouette({"north", "east", "south", "west"})
+    cv.save(rocker_path(kind, facing), rocker_path(kind, facing, mask=True) if cloth else None)
+
+
 def main():
-    for d in (TABLE_DIR, SECT_DIR):
+    for d in (TABLE_DIR, SECT_DIR, ROCKER_DIR):
         shutil.rmtree(d, ignore_errors=True)
         os.makedirs(d)
     for i in range(16):
@@ -151,7 +209,10 @@ def main():
         # free-standing seat. Graphic_Multi masks append "m" with NO underscore.
         shutil.copy(sect_path(facing, "a", "a"), f"{SECT_DIR}/Slopkea_Sectional_{facing}.png")
         shutil.copy(sect_path(facing, "a", "a", True), f"{SECT_DIR}/Slopkea_Sectional_{facing}m.png")
-    print("drew 16 table and 36 sectional variants")
+    for kind in ROCKER_KINDS:
+        for facing in FACINGS:
+            draw_rocking_chair(kind, facing)
+    print("drew 16 table and 36 sectional variants, 2 rocking chairs")
 
 
 if __name__ == "__main__":

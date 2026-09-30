@@ -46,6 +46,17 @@ neighbours.
   side where a part runs on into the same part of the next piece. That keeps the backrest one
   band all the way round an L or U, and the seating one unbroken surface inside it.
 
+## Rocking chairs
+
+Free-standing, so one view per facing and no variants: `Slopkea_RockingChair<Wood|Cloth>_<rot>`.
+Two runners run past the seat front and back, each tapering over its last tenth at both ends
+so it reads as a curve lifting off the floor. The wooden chair is all stuff (slats and
+spindles as identical marks). The cloth chair's stuff is the upholstery only: its frame is a
+fixed oak, black in the mask, so `verify_art.py` checks the tinted share is upholstery-sized.
+
+The rocking is not in the art. `Building_SlopkeaRockingChair` is drawn in real time and eases
+the whole sprite back and forth along its facing while someone sits in it.
+
 ## The contract with the C#
 
 `verify_art.py` checks:
@@ -68,5 +79,6 @@ same rules as the game.
 | `Slopkea_Table_0..15` | 192x192 | 1x1 at `drawSize (1,1)`; `_0` is the def graphic |
 | `Slopkea_Sectional_<facing>_<cw><ccw>` (+`_m`) | 192x192 | 36 variants and masks |
 | `Slopkea_Sectional_<rot>` (+`m`) | 192x192 | the free-standing seat, as the def's `Graphic_Multi` |
+| `Slopkea_RockingChair<Wood/Cloth>_<rot>` | 192x192 | 1x1; the cloth chair has `<rot>m` masks |
 | `About/Preview.png` | 640x360 | composited from the shipped textures |
 | `About/ModIcon.png` | 256x256 | one sectional corner, which still reads at 32px |

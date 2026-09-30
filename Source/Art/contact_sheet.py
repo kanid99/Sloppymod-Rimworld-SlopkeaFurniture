@@ -4,7 +4,7 @@ import sys
 from PIL import Image, ImageDraw
 
 from compose import render, tinted
-from draw_sprites import FACINGS, SIDE_STATES, sect_path, table_path
+from draw_sprites import FACINGS, ROCKER_KINDS, SIDE_STATES, rocker_path, sect_path, table_path
 from slopkea_draw import CELL
 
 WOOD = (133, 94, 62)
@@ -58,7 +58,16 @@ def main(out):
     sheet = sheet.crop((0, 0, max(sheet.width, 2 * u.width + 30), y1 + u.height + 10))
     sheet.alpha_composite(u, (10, y1))
     sheet.alpha_composite(lt, (20 + u.width, y1))
-    sheet.convert("RGB").save(out)
+    # Rocking chairs, one row per kind, all four views.
+    y2 = sheet.height + 20
+    full = Image.new("RGBA", (sheet.width, y2 + 2 * (T + 4) + 10), (40, 40, 44, 255))
+    full.alpha_composite(sheet, (0, 0))
+    ImageDraw.Draw(full).text((10, y2 - 14), "rocking chairs: wood (all stuff), cloth (stuff upholstery, oak frame)", fill="white")
+    for r, (kind, color) in enumerate(zip(ROCKER_KINDS, (WOOD, (150, 60, 60)))):
+        for c, f in enumerate(FACINGS):
+            m = rocker_path(kind, f, True) if kind == "Cloth" else None
+            full.alpha_composite(tinted(rocker_path(kind, f), color, m).resize((T, T)), (10 + c * (T + 4), y2 + r * (T + 4)))
+    full.convert("RGB").save(out)
 
 
 if __name__ == "__main__":

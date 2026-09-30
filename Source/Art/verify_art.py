@@ -7,7 +7,7 @@ import xml.etree.ElementTree as ET
 
 from PIL import Image
 
-from draw_sprites import BITS, FACINGS, SIDE_STATES, sect_path, table_path
+from draw_sprites import BITS, FACINGS, ROCKER_KINDS, SIDE_STATES, rocker_path, sect_path, table_path
 from slopkea_draw import CELL, CW, CCW, OPP
 
 errors = []
@@ -75,6 +75,24 @@ for f in FACINGS:
             red = sum(1 for r, g, b in mask.get_flattened_data() if r > 127) / (CELL * CELL)
             check(red > 0.8, f"{m}: only {red:.0%} tinted")
 
+# Rocking chairs: free-standing, so every side is silhouette; the cloth one's
+# oak frame is untinted, so its mask must leave a real share black.
+for kind in ROCKER_KINDS:
+    for f in FACINGS:
+        p = rocker_path(kind, f)
+        check(os.path.exists(p), f"missing {p}")
+        if os.path.exists(p):
+            check_edges(p, {"north", "east", "south", "west"})
+        if kind == "Cloth":
+            m = rocker_path(kind, f, mask=True)
+            check(os.path.exists(m), f"missing {m}")
+            if os.path.exists(m):
+                a = Image.open(p).getchannel("A")
+                reds = [r > 127 for r, g, b in Image.open(m).convert("RGB").get_flattened_data()]
+                solid = [v > 127 for v in a.get_flattened_data()]
+                share = sum(r and s_ for r, s_ in zip(reds, solid)) / max(1, sum(solid))
+                check(0.3 < share < 0.8, f"{m}: {share:.0%} of the chair tinted, want upholstery only")
+
 # Joined edges carry on into the neighbour: the two edges that meet must match.
 def edge_mean(path, side):
     px = edge_pixels(Image.open(path).convert("RGBA"), side, 1)
@@ -112,4 +130,4 @@ check('"north", "east", "south", "west"' in src, "sectional facing names out of 
 if errors:
     print("\n".join(errors))
     sys.exit(1)
-print("art ok: 16 table variants, 36 sectional variants + masks, defs and C# agree")
+print("art ok: 16 table variants, 36 sectional variants + masks, 2 rocking chairs; defs and C# agree")

@@ -25,6 +25,8 @@ BLACK = (0, 0, 0)
 
 # Untinted parts keep their own colour (black in the mask).
 FOOT = (46, 42, 40)
+# A fixed wood frame, for pieces whose stuff is only the upholstery.
+OAK_LIT, OAK, OAK_WALL, OAK_DARK = (196, 150, 104), (168, 124, 82), (128, 90, 58), (98, 68, 44)
 
 # Screen directions, x right and y DOWN: map z runs up, so north is the TOP.
 DIRS = {"north": (0, -1), "east": (1, 0), "south": (0, 1), "west": (-1, 0)}
@@ -66,7 +68,7 @@ class Canvas:
         layer.putalpha(a)
         self.img.alpha_composite(layer)
 
-    def slab(self, r, h, face=TOP, wall=WALL, joined=()):
+    def slab(self, r, h, face=TOP, wall=WALL, joined=(), tint=True, lit=TOP_LIT, wall_dark=WALL_DARK):
         """A raised part: lit top face over a darker wall LIFT*h deep, lit lip on top.
 
         `joined` lists the screen sides where this part runs on into the same part
@@ -77,11 +79,11 @@ class Canvas:
         wall_h = 0 if "south" in joined else min(LIFT * h, (y1 - y0) * 0.6)
         self.soft_shadow(r)
         if wall_h:
-            self.rect((x0, y1 - wall_h, x1, y1), wall)
-            self.rect((x0, y1 - wall_h, x1, y1 - wall_h + 0.006), WALL_DARK)
-        self.rect((x0, y0, x1, y1 - wall_h), face)
+            self.rect((x0, y1 - wall_h, x1, y1), wall, tint)
+            self.rect((x0, y1 - wall_h, x1, y1 - wall_h + 0.006), wall_dark, tint)
+        self.rect((x0, y0, x1, y1 - wall_h), face, tint)
         if "north" not in joined:
-            self.rect((x0, y0, x1, y0 + 0.012), TOP_LIT)
+            self.rect((x0, y0, x1, y0 + 0.012), lit, tint)
 
     def silhouette(self, open_sides):
         """Black ring on the outer silhouette only.
