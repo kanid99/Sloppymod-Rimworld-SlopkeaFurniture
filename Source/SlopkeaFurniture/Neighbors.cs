@@ -1,9 +1,10 @@
 using RimWorld;
+using UnityEngine;
 using Verse;
 
 namespace SlopkeaFurniture
 {
-    /// <summary>Shared helpers for furniture that redraws itself based on matching neighbours.</summary>
+    /// <summary>Shared helpers for furniture that picks its texture from matching neighbours.</summary>
     public static class Neighbors
     {
         public static T Get<T>(Thing self, IntVec3 dir) where T : Thing
@@ -25,6 +26,18 @@ namespace SlopkeaFurniture
             {
                 if (c.InBounds(map)) map.mapDrawer.MapMeshDirty(c, MapMeshFlagDefOf.Things);
             }
+        }
+
+        /// <summary>
+        /// Print one pre-drawn variant over the cell. The variants are views, drawn
+        /// per facing, so the plane is never rotated (that would rotate the light too).
+        /// </summary>
+        public static void PrintVariant(SectionLayer layer, Thing thing, string texPath, Shader shader)
+        {
+            Graphic g = GraphicDatabase.Get<Graphic_Single>(texPath, shader, Vector2.one, thing.DrawColor, thing.DrawColorTwo);
+            Vector3 center = thing.Position.ToVector3Shifted();
+            center.y = thing.def.Altitude;
+            Printer_Plane.PrintPlane(layer, center, Vector2.one, g.MatSingle);
         }
     }
 }

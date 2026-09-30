@@ -27,11 +27,10 @@
     <description>A single flat-pack table panel. Drag out any shape - rectangles, L's, U's, a crude outline of Sweden - and neighbouring panels lock together into one seamless dining table. Pawns can eat at every edge.</description>
     <thingClass>SlopkeaFurniture.Building_SlopkeaTable</thingClass>
     <graphicData>
-      <texPath>Slopkea/Table/Table_Top</texPath>
+      <texPath>Things/Building/Furniture/Slopkea/Table/Slopkea_Table_0</texPath>
       <graphicClass>Graphic_Single</graphicClass>
       <drawSize>(1,1)</drawSize>
     </graphicData>
-    <uiIconPath>Slopkea/Table/Table_Icon</uiIconPath>
     <placingDraggableDimensions>2</placingDraggableDimensions>
     <rotatable>false</rotatable>
     <passability>PassThroughOnly</passability>
@@ -67,11 +66,11 @@
     <description>One seat of a modular sectional. Line them up, turn a corner, make a conversation pit. Backrests follow each seat's facing, armrests appear at the open ends and corners wrap themselves. Doubles as a comfy dining chair.</description>
     <thingClass>SlopkeaFurniture.Building_SlopkeaSectional</thingClass>
     <graphicData>
-      <texPath>Slopkea/Sectional/Sectional_Seat</texPath>
-      <graphicClass>Graphic_Single</graphicClass>
+      <texPath>Things/Building/Furniture/Slopkea/Sectional/Slopkea_Sectional</texPath>
+      <graphicClass>Graphic_Multi</graphicClass>
+      <shaderType>CutoutComplex</shaderType>
       <drawSize>(1,1)</drawSize>
     </graphicData>
-    <uiIconPath>Slopkea/Sectional/Sectional_Icon</uiIconPath>
     <placingDraggableDimensions>1</placingDraggableDimensions>
     <rotatable>true</rotatable>
     <defaultPlacingRot>South</defaultPlacingRot>

@@ -12,4 +12,4 @@ Flat-pack, IKEA-inspired furniture for RimWorld 1.6. Some assembly required.
 - `Defs/` – ThingDefs
 - `1.6/Assemblies/` – compiled DLL
 - `Source/SlopkeaFurniture/` – C# (`dotnet build -c Release`, references `Krafs.Rimworld.Ref`)
-- `Source/make_textures.py` – regenerates the placeholder textures (needs Pillow)
+- `Source/Art/` – draws every texture and checks it against the defs and C#; see its README

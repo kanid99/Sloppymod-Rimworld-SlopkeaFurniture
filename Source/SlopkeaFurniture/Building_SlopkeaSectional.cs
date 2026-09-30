@@ -1,17 +1,19 @@
-using UnityEngine;
+using RimWorld;
 using Verse;
 
 namespace SlopkeaFurniture
 {
     /// <summary>
-    /// One seat of a modular sectional couch. Place seats in any line or L/U shape:
-    /// backrests follow each seat's rotation, armrests appear only at open ends,
-    /// and a seat whose front neighbour turns the corner grows a second backrest.
+    /// One seat of a modular sectional couch. Place seats in any line or L/U shape.
+    /// Each side of a seat is an armrest (a), joined to the next seat (j), or a
+    /// corner backrest (c) when the seat in front turns the corner; the seat prints
+    /// the pre-drawn view for its facing and those two states.
     /// </summary>
     public class Building_SlopkeaSectional : Building
     {
-        private const string BackTex = "Slopkea/Sectional/Sectional_Back";
-        private const string ArmTex = "Slopkea/Sectional/Sectional_Arm";
+        // Must match Source/Art/draw_sprites.py (sect_path).
+        private const string TexPrefix = "Things/Building/Furniture/Slopkea/Sectional/Slopkea_Sectional_";
+        private static readonly string[] FacingNames = { "north", "east", "south", "west" };
 
         public override void SpawnSetup(Map map, bool respawningAfterLoad)
         {
@@ -27,31 +29,25 @@ namespace SlopkeaFurniture
             Neighbors.DirtyAround(map, pos);
         }
 
+        public char SideState(Rot4 side)
+        {
+            if (Neighbors.Get<Building_SlopkeaSectional>(this, side.FacingCell) != null) return 'j';
+            // Corner seat: the seat in front has its back to this side, so the backrest wraps.
+            Building_SlopkeaSectional front = Neighbors.Get<Building_SlopkeaSectional>(this, Rotation.FacingCell);
+            if (front != null && front.Rotation == side.Opposite) return 'c';
+            return 'a';
+        }
+
+        public string VariantPath()
+        {
+            char cw = SideState(Rotation.Rotated(RotationDirection.Clockwise));
+            char ccw = SideState(Rotation.Rotated(RotationDirection.Counterclockwise));
+            return TexPrefix + FacingNames[Rotation.AsInt] + "_" + cw + ccw;
+        }
+
         public override void Print(SectionLayer layer)
         {
-            base.Print(layer);
-            Color color = DrawColor;
-            Material back = MaterialPool.MatFrom(BackTex, ShaderDatabase.Cutout, color);
-            Material arm = MaterialPool.MatFrom(ArmTex, ShaderDatabase.Cutout, color);
-            Vector3 center = Position.ToVector3Shifted();
-            center.y = def.Altitude + 0.01f;
-
-            Rot4 facing = Rotation;
-            Printer_Plane.PrintPlane(layer, center, Vector2.one, back, facing.Opposite.AsAngle);
-
-            Building_SlopkeaSectional front = Neighbors.Get<Building_SlopkeaSectional>(this, facing.FacingCell);
-            Rot4[] sides = { facing.Rotated(RotationDirection.Clockwise), facing.Rotated(RotationDirection.Counterclockwise) };
-            foreach (Rot4 side in sides)
-            {
-                if (Neighbors.Get<Building_SlopkeaSectional>(this, side.FacingCell) != null) continue;
-
-                // Corner seat: the seat in front of us faces along this side's axis
-                // with its back toward this side, so the backrest wraps around.
-                bool corner = front != null && front.Rotation == side.Opposite;
-                Vector3 pos = center;
-                pos.y += 0.005f;
-                Printer_Plane.PrintPlane(layer, pos, Vector2.one, corner ? back : arm, side.AsAngle);
-            }
+            Neighbors.PrintVariant(layer, this, VariantPath(), ShaderDatabase.CutoutComplex);
         }
     }
 }
