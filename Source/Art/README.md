@@ -49,33 +49,43 @@ neighbours.
 ## Rocking chairs
 
 Free-standing, so they have one view per facing and no variants:
-`Slopkea_RockingChair<Wood|Cloth>_<rot>`.
+`Slopkea_RockingChair<Wood|Cloth>_<rot>`. West is east mirrored, because both chairs are
+symmetric side to side.
 
-**They are drawn in elevation, not as a floor plan.** From straight above, a rocking chair is
-a box with two sticks beside it, and the first version read exactly like that. What makes it a
-rocking chair is the curved runner and the tall back, so each view is built to show them.
-Vanilla furniture takes the same three-quarter view.
+**They are drawn in three-quarter elevation, like vanilla furniture, not as a floor plan.**
+From straight above, a rocking chair is just a box.
 
-* **East:** side profile, and the view that sells it. The runner is a smile, low in the middle
-  with both ends lifting off the floor. The legs stand on it, and the back post leans back
-  to a round crest.
-* **South:** from the front. The tall back rises above the seat, with spindles on the wooden
-  chair and a tufted pad on the cloth one. The runners come towards us under it and end in
-  curled tips.
-* **North:** from behind. The back of the backrest is nearest and rises up the screen, and the
-  runners run out past it at both ends.
-* **West:** east mirrored, because the chair is symmetric side to side.
+### Wooden: spindle-back rocker
 
-Parts are round-ended strokes (`Canvas.line`) rather than slabs, and the silhouette ring is
-3px here rather than 4px, so the thin turned parts keep some wood inside their outline.
+All stuff. What makes it a rocker is the curved runners, so every view is built round them.
 
-The wooden chair is all stuff. On the cloth chair, the stuff is only the upholstery: the frame
-is a fixed oak, black in the mask. `verify_art.py` checks that the tinted share is
-upholstery-sized. It is 15-80% because a side view shows less pad.
+* **East:** the runner is a smile, low in the middle with both ends lifting off the floor.
+* **South and north:** the runners are two long skids running past the chair at both ends.
+  They widen towards the viewer, and each end rolls up off the floor. The legs stand on the
+  runners and the arms tie into the back posts. The back rises over the seat, with spindles
+  against a shaded panel. The panel runs up under the crest rail, so no enclosed gap is left
+  for the silhouette to fill black.
 
-**The rocking is not in the art.** `Building_SlopkeaRockingChair` is drawn in real time while
-someone sits in it. In the side views it tilts the sprite up to 4 degrees on its runner. The
-front and back views cannot show a tilt, so there it eases back and forth along its facing.
+### Cloth: glider rocker
+
+The owner's reference is a nursery glider. It is overstuffed: a tall back in channel-tufted
+pillows, pillow arm pads and a thick seat cushion, all in the stuff colour. The frame is
+**white paint**, black in the mask, with wide flat arm panels. It stands on a **flat base with
+glide links**, and has no curved runners. `pillow()` draws one channel: a rounded pad, lit on
+top and shaded underneath.
+
+### Motion
+
+The motion is not in the art. `Building_SlopkeaRockingChair` is drawn in real time while
+someone sits in it.
+
+* **Wooden:** tilts up to 4 degrees on its runners in the side views, and slides along its
+  facing in the front and back views.
+* **Glider:** `Building_SlopkeaGlider` only ever slides, because that is what a glider does.
+
+Parts are round-ended strokes (`Canvas.line`) and polygons. The silhouette ring is 3px here,
+so the thin turned parts keep some colour inside their outline. `verify_art.py` checks that the
+glider's tinted share is upholstery-sized.
 
 ## The contract with the C#
 

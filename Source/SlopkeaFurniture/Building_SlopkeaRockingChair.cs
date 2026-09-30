@@ -18,6 +18,9 @@ namespace SlopkeaFurniture
         private const float RockAngle = 4f;          // degrees, side views
         private const float RockSpeed = 0.06f;       // radians per tick
 
+        /// <summary>False for a glider: it swings flat on its links, so it only slides.</summary>
+        protected virtual bool Tilts => true;
+
         private bool Occupied()
         {
             Pawn p = Position.GetFirstPawn(Map);
@@ -31,7 +34,7 @@ namespace SlopkeaFurniture
                 // Offset per-thing so two chairs side by side do not rock in lockstep.
                 float t = (Find.TickManager.TicksGame + thingIDNumber * 37) * RockSpeed;
                 float s = Mathf.Sin(t);
-                if (Rotation.IsHorizontal)
+                if (Tilts && Rotation.IsHorizontal)
                 {
                     Graphic.Draw(drawLoc, flip ? Rotation.Opposite : Rotation, this, s * RockAngle);
                     return;

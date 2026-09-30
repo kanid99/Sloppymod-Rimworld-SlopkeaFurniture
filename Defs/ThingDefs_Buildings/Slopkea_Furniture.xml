@@ -138,8 +138,9 @@
 
   <ThingDef ParentName="SlopkeaRockingChairBase">
     <defName>Slopkea_RockingChairCloth</defName>
-    <label>GUNGVIK upholstered rocking chair</label>
-    <description>A padded rocking chair on an oak frame. The upholstery is whatever fabric or leather it is built from; the frame is always oak. Rocks gently while someone sits in it.</description>
+    <label>GUNGVIK glider rocker</label>
+    <description>An overstuffed nursery glider: channel-tufted back, pillow arms and a deep seat cushion on a white painted frame. The upholstery is whatever fabric or leather it is built from. Glides smoothly back and forth while someone sits in it. Ottoman sold separately, eventually.</description>
+    <thingClass>SlopkeaFurniture.Building_SlopkeaGlider</thingClass>
     <graphicData>
       <texPath>Things/Building/Furniture/Slopkea/RockingChair/Slopkea_RockingChairCloth</texPath>
       <graphicClass>Graphic_Multi</graphicClass>

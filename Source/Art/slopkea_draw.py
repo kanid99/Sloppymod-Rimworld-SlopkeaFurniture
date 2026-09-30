@@ -25,8 +25,6 @@ BLACK = (0, 0, 0)
 
 # Untinted parts keep their own colour (black in the mask).
 FOOT = (46, 42, 40)
-# A fixed wood frame, for pieces whose stuff is only the upholstery.
-OAK_LIT, OAK, OAK_WALL, OAK_DARK = (196, 150, 104), (168, 124, 82), (128, 90, 58), (98, 68, 44)
 
 # Screen directions, x right and y DOWN: map z runs up, so north is the TOP.
 DIRS = {"north": (0, -1), "east": (1, 0), "south": (0, 1), "west": (-1, 0)}
