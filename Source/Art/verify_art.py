@@ -121,6 +121,24 @@ for f in FACINGS:
             joined = {s_ for s_, st in ((CW[f], cw), (CCW[f], ccw)) if st == "j"}
             check_edges(p, {"north", "east", "south", "west"} - joined)
 
+# Kitchen modules and bookcase: side joins, masks, all four facings.
+import draw_kitchen as dk
+for f in FACINGS:
+    for cw in "oj":
+        for ccw in "oj":
+            joined = {s_ for s_, st in ((CW[f], cw), (CCW[f], ccw)) if st == "j"}
+            for p, m in [(dk.kitchen_path(mod, f, cw, ccw), dk.kitchen_path(mod, f, cw, ccw, True))
+                         for mod in dk.MODULES] + [(dk.book_path(f, cw, ccw), dk.book_path(f, cw, ccw, True))]:
+                check(os.path.exists(m), f"missing {m}")
+                check_edges(p, {"north", "east", "south", "west"} - joined)
+kr = open("Source/SlopkeaFurniture/KitchenRun.cs").read()
+for prefix, sample in (('Dir = "', dk.kitchen_path("Cabinet", "north", "o", "o")),
+                       ('Bookcase = "', dk.book_path("north", "o", "o"))):
+    got = kr.split(prefix, 1)[1].split('"', 1)[0]
+    check(sample.startswith("Textures/" + got), f"KitchenRun.cs: {got} does not match {sample}")
+for mod in dk.MODULES:
+    check(f'KitchenPaths.Dir + "{mod}_"' in kr, f"KitchenRun.cs: no print path for {mod}")
+
 # Joined edges carry on into the neighbour: the two edges that meet must match.
 def edge_mean(path, side):
     px = edge_pixels(Image.open(path).convert("RGBA"), side, 1)
@@ -161,4 +179,4 @@ check('"north", "east", "south", "west"' in src, "sectional facing names out of 
 if errors:
     print("\n".join(errors))
     sys.exit(1)
-print("art ok: table, sectional, rocking chairs, desk, rug (47) and shelf variants; defs and C# agree")
+print("art ok: table, sectional, rocking chairs, desk, rug, shelf, kitchen and bookcase variants; defs and C# agree")

@@ -109,6 +109,26 @@ or more. An outline *crossing* the edge is legitimate, like the bottom of the de
 band. Painting a black strip down a joined edge makes it fail, which is how the check itself
 was tested.
 
+## Kitchen run and bookcase
+
+These are in `draw_kitchen.py`. They join along their sides like the cube shelving:
+`Slopkea_<Cabinet|Sink|Hob>_<facing>_<cw><ccw>` and `Slopkea_Bookcase_<facing>_<cw><ccw>`.
+The three kitchen modules join *each other* (`ISlopkeaKitchenModule` in the C#), so a run can
+mix them in any order.
+
+* **Stuff is the carcass.** The worktop is a fixed pale stone, and the handles, basin, hob
+  and knobs are fixed steel and black glass, all black in the mask.
+* **The worktop overhangs,** so it always runs edge to edge. Only the carcass is inset at an
+  open end.
+* **Doors are recessed panels,** made of tone steps and never outlined. Side views show the
+  doors edge-on.
+* **The bookcase's painted books are untinted,** so the stuff colours only the case. Stored
+  books are drawn by the game in front of them.
+
+Rotation is the way the **front** faces, as for every Slopkea piece. That is the opposite of
+vanilla workbenches, whose rotation is the way the worker faces, so the hob's
+`interactionCellOffset` is `(0,0,1)`, which puts the cook at the front.
+
 ## The contract with the C#
 
 `verify_art.py` checks:

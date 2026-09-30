@@ -9,11 +9,14 @@ Flat-pack, IKEA-inspired furniture for RimWorld 1.6. Some assembly required.
 - **LÅNGBORD desk segment** – drag out any desk shape; every cell is a research bench worked from its front.
 - **KUBBLÅ cube shelf** – rotatable storage, two stacks per unit; units facing the same way join into one run.
 - **MATTBIT rug segment** – drag out any rug shape; the border follows the outline, and furniture stands on it.
+- **SKÅPKÖK kitchen run** – cabinet (stores food), sink (room cleanliness) and hob (electric stove; cooks everything the vanilla electric stove does, via `Patches/Slopkea_HobRecipes.xml`). Any modules facing the same way join into one counter.
+- **HYLLVIK bookcase** – books-only storage, three stacks per unit; units facing the same way join into a run.
 - **GLÖMSTRÄK table segment** – 1x1 dining-table panels placed with an area drag. Adjacent panels merge: rim only on exposed sides, legs only on outside corners. Any shape works and every cell is an eating surface.
 
 ## Layout
 - `About/`, `loadFolders.xml` – mod metadata
 - `Defs/` – ThingDefs
+- `Patches/` – gives the hob the electric stove's recipes
 - `1.6/Assemblies/` – compiled DLL
 - `Source/SlopkeaFurniture/` – C# (`dotnet build -c Release`, references `Krafs.Rimworld.Ref`)
 - `Source/Art/` – draws every texture and checks it against the defs and C#; see its README

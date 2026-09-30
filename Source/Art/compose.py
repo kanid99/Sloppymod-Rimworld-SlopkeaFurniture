@@ -87,6 +87,19 @@ def render(scene, colors, size, cell_px=CELL, bg=(92, 84, 72), rugs=()):
         elif thing[0] == "desk":
             i = bits_index(same("desk"), (x, z))
             tile = tinted(desk_path(i), colors.get("desk", (235, 232, 222)), desk_path(i, True))
+        elif thing[0] in ("Cabinet", "Sink", "Hob", "book"):
+            from draw_kitchen import book_path, kitchen_path
+            kitchen = ("Cabinet", "Sink", "Hob")
+            st = []
+            for side in (CW[thing[1]], CCW[thing[1]]):
+                n = scene.get(step((x, z), side))
+                ok = n and n[1] == thing[1] and ((n[0] in kitchen) if thing[0] in kitchen else n[0] == thing[0])
+                st.append("j" if ok else "o")
+            if thing[0] == "book":
+                p, m = book_path(thing[1], *st), book_path(thing[1], *st, mask=True)
+            else:
+                p, m = kitchen_path(thing[0], thing[1], *st), kitchen_path(thing[0], thing[1], *st, mask=True)
+            tile = tinted(p, colors.get(thing[0], (235, 232, 222)), m)
         elif thing[0] == "shelf":
             cw, ccw = shelf_states(scene, (x, z))
             tile = tinted(shelf_path(thing[1], cw, ccw), colors.get("shelf", (240, 240, 236)),

@@ -306,4 +306,203 @@
     </building>
   </ThingDef>
 
+  <!-- SKÅPKÖK: kitchen run modules. Any modules facing the same way join into one
+       counter. Rotation is the way the FRONT faces, as for every Slopkea piece. -->
+  <ThingDef Name="SlopkeaKitchenBase" ParentName="SlopkeaFurnitureBase" Abstract="True">
+    <placingDraggableDimensions>1</placingDraggableDimensions>
+    <rotatable>true</rotatable>
+    <defaultPlacingRot>South</defaultPlacingRot>
+    <passability>PassThroughOnly</passability>
+    <pathCost>50</pathCost>
+    <fillPercent>0.5</fillPercent>
+    <castEdgeShadows>true</castEdgeShadows>
+    <staticSunShadowHeight>0.35</staticSunShadowHeight>
+    <surfaceType>Item</surfaceType>
+    <stuffCategories>
+      <li>Woody</li>
+      <li>Metallic</li>
+    </stuffCategories>
+    <costStuffCount>30</costStuffCount>
+  </ThingDef>
+
+  <ThingDef ParentName="SlopkeaKitchenBase">
+    <defName>Slopkea_Cabinet</defName>
+    <label>SKÅPKÖK kitchen cabinet</label>
+    <description>A stretch of worktop over cupboards. Joins any SKÅPKÖK module beside it into one kitchen run, and the cupboards store food.</description>
+    <thingClass>SlopkeaFurniture.Building_SlopkeaCabinet</thingClass>
+    <graphicData>
+      <texPath>Things/Building/Furniture/Slopkea/Kitchen/Slopkea_Cabinet</texPath>
+      <graphicClass>Graphic_Multi</graphicClass>
+      <shaderType>CutoutComplex</shaderType>
+      <drawSize>(1,1)</drawSize>
+    </graphicData>
+    <costList>
+      <Steel>5</Steel>
+    </costList>
+    <statBases>
+      <MaxHitPoints>90</MaxHitPoints>
+      <WorkToBuild>900</WorkToBuild>
+      <Mass>12</Mass>
+      <Flammability>1.0</Flammability>
+      <Beauty>1</Beauty>
+    </statBases>
+    <canOverlapZones>false</canOverlapZones>
+    <inspectorTabs>
+      <li>ITab_Storage</li>
+    </inspectorTabs>
+    <building>
+      <preventDeteriorationOnTop>true</preventDeteriorationOnTop>
+      <ignoreStoredThingsBeauty>true</ignoreStoredThingsBeauty>
+      <maxItemsInCell>2</maxItemsInCell>
+      <blueprintClass>Blueprint_Storage</blueprintClass>
+      <fixedStorageSettings>
+        <filter>
+          <categories>
+            <li>Root</li>
+          </categories>
+        </filter>
+      </fixedStorageSettings>
+      <defaultStorageSettings>
+        <priority>Preferred</priority>
+        <filter>
+          <categories>
+            <li>Foods</li>
+          </categories>
+        </filter>
+      </defaultStorageSettings>
+    </building>
+  </ThingDef>
+
+  <ThingDef ParentName="SlopkeaKitchenBase">
+    <defName>Slopkea_Sink</defName>
+    <label>SKÅPKÖK sink</label>
+    <description>A counter module with a steel basin. Joins the kitchen run, and somebody might even wash up, which keeps the room a little cleaner.</description>
+    <thingClass>SlopkeaFurniture.Building_SlopkeaSink</thingClass>
+    <graphicData>
+      <texPath>Things/Building/Furniture/Slopkea/Kitchen/Slopkea_Sink</texPath>
+      <graphicClass>Graphic_Multi</graphicClass>
+      <shaderType>CutoutComplex</shaderType>
+      <drawSize>(1,1)</drawSize>
+    </graphicData>
+    <costList>
+      <Steel>20</Steel>
+    </costList>
+    <statBases>
+      <MaxHitPoints>90</MaxHitPoints>
+      <WorkToBuild>1200</WorkToBuild>
+      <Mass>14</Mass>
+      <Flammability>1.0</Flammability>
+      <Beauty>1</Beauty>
+      <Cleanliness>0.6</Cleanliness>
+    </statBases>
+  </ThingDef>
+
+  <ThingDef ParentName="SlopkeaKitchenBase">
+    <defName>Slopkea_Hob</defName>
+    <label>SKÅPKÖK hob</label>
+    <description>An electric hob built into the kitchen run. Cooks everything an electric stove cooks, from the front of the counter.</description>
+    <thingClass>SlopkeaFurniture.Building_SlopkeaHob</thingClass>
+    <graphicData>
+      <texPath>Things/Building/Furniture/Slopkea/Kitchen/Slopkea_Hob</texPath>
+      <graphicClass>Graphic_Multi</graphicClass>
+      <shaderType>CutoutComplex</shaderType>
+      <drawSize>(1,1)</drawSize>
+    </graphicData>
+    <costList>
+      <Steel>40</Steel>
+      <ComponentIndustrial>2</ComponentIndustrial>
+    </costList>
+    <statBases>
+      <MaxHitPoints>120</MaxHitPoints>
+      <WorkToBuild>2000</WorkToBuild>
+      <Mass>20</Mass>
+      <Flammability>1.0</Flammability>
+      <Beauty>1</Beauty>
+      <WorkTableWorkSpeedFactor>1</WorkTableWorkSpeedFactor>
+    </statBases>
+    <hasInteractionCell>true</hasInteractionCell>
+    <!-- (0,0,1): the cook stands in front, the side the hob faces. -->
+    <interactionCellOffset>(0,0,1)</interactionCellOffset>
+    <researchPrerequisites>
+      <li>Electricity</li>
+    </researchPrerequisites>
+    <inspectorTabs>
+      <li>ITab_Bills</li>
+    </inspectorTabs>
+    <building>
+      <isMealSource>true</isMealSource>
+      <heatPerTickWhileWorking>0.10</heatPerTickWhileWorking>
+    </building>
+    <comps>
+      <li Class="CompProperties_Power">
+        <compClass>CompPowerTrader</compClass>
+        <basePowerConsumption>350</basePowerConsumption>
+        <shortCircuitInRain>true</shortCircuitInRain>
+      </li>
+      <li Class="CompProperties_Flickable" />
+      <li Class="CompProperties_Breakdownable" />
+    </comps>
+  </ThingDef>
+
+  <!-- BILLY-ish: HYLLVIK bookcase. Units facing the same way join into a run. -->
+  <ThingDef ParentName="SlopkeaFurnitureBase">
+    <defName>Slopkea_Bookcase</defName>
+    <label>HYLLVIK bookcase</label>
+    <description>A tall bookcase, three shelves deep in books. Line them up and they join into one long wall of books. Stores books only; the paperbacks painted on the shelves are for show.</description>
+    <thingClass>SlopkeaFurniture.Building_SlopkeaBookcase</thingClass>
+    <graphicData>
+      <texPath>Things/Building/Furniture/Slopkea/Bookcase/Slopkea_Bookcase</texPath>
+      <graphicClass>Graphic_Multi</graphicClass>
+      <shaderType>CutoutComplex</shaderType>
+      <drawSize>(1,1)</drawSize>
+    </graphicData>
+    <placingDraggableDimensions>1</placingDraggableDimensions>
+    <rotatable>true</rotatable>
+    <defaultPlacingRot>South</defaultPlacingRot>
+    <passability>PassThroughOnly</passability>
+    <pathCost>50</pathCost>
+    <fillPercent>0.6</fillPercent>
+    <castEdgeShadows>true</castEdgeShadows>
+    <staticSunShadowHeight>0.6</staticSunShadowHeight>
+    <surfaceType>Item</surfaceType>
+    <canOverlapZones>false</canOverlapZones>
+    <stuffCategories>
+      <li>Woody</li>
+      <li>Metallic</li>
+      <li>Stony</li>
+    </stuffCategories>
+    <costStuffCount>30</costStuffCount>
+    <statBases>
+      <MaxHitPoints>80</MaxHitPoints>
+      <WorkToBuild>700</WorkToBuild>
+      <Mass>10</Mass>
+      <Flammability>1.0</Flammability>
+      <Beauty>3</Beauty>
+    </statBases>
+    <inspectorTabs>
+      <li>ITab_Storage</li>
+    </inspectorTabs>
+    <building>
+      <preventDeteriorationOnTop>true</preventDeteriorationOnTop>
+      <ignoreStoredThingsBeauty>true</ignoreStoredThingsBeauty>
+      <maxItemsInCell>3</maxItemsInCell>
+      <blueprintClass>Blueprint_Storage</blueprintClass>
+      <fixedStorageSettings>
+        <filter>
+          <categories>
+            <li>Books</li>
+          </categories>
+        </filter>
+      </fixedStorageSettings>
+      <defaultStorageSettings>
+        <priority>Preferred</priority>
+        <filter>
+          <categories>
+            <li>Books</li>
+          </categories>
+        </filter>
+      </defaultStorageSettings>
+    </building>
+  </ThingDef>
+
 </Defs>
