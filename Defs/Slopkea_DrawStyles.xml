@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Defs>
+  <!-- How Slopkea pieces are dragged out when placing. RimWorld 1.5+ replaced
+       placingDraggableDimensions with drawStyleCategory; these are our own, on
+       the game's DrawStyle classes, so they don't depend on vanilla def names. -->
+
+  <DrawStyleDef>
+    <defName>Slopkea_FilledRectangle</defName>
+    <label>filled rectangle</label>
+    <uiIconPath>UI/Slopkea/DrawStyles/FilledRectangle</uiIconPath>
+    <drawStyleType>DrawStyle_FilledRectangle</drawStyleType>
+    <drawArea>true</drawArea>
+  </DrawStyleDef>
+
+  <DrawStyleDef>
+    <defName>Slopkea_EmptyRectangle</defName>
+    <label>rectangle outline</label>
+    <uiIconPath>UI/Slopkea/DrawStyles/EmptyRectangle</uiIconPath>
+    <drawStyleType>DrawStyle_EmptyRectangle</drawStyleType>
+    <drawOutline>true</drawOutline>
+  </DrawStyleDef>
+
+  <DrawStyleDef>
+    <defName>Slopkea_Line</defName>
+    <label>line</label>
+    <uiIconPath>UI/Slopkea/DrawStyles/Line</uiIconPath>
+    <drawStyleType>DrawStyle_Line</drawStyleType>
+  </DrawStyleDef>
+
+  <!-- Drag-to-shape pieces: table, desk, rug, planter. -->
+  <DrawStyleCategoryDef>
+    <defName>Slopkea_Area</defName>
+    <styles>
+      <li>Slopkea_FilledRectangle</li>
+      <li>Slopkea_Line</li>
+      <li>Slopkea_EmptyRectangle</li>
+    </styles>
+  </DrawStyleCategoryDef>
+
+  <!-- Runs: sectional, shelving, kitchen, bookcase, wardrobe, bench, divider. -->
+  <DrawStyleCategoryDef>
+    <defName>Slopkea_Line</defName>
+    <styles>
+      <li>Slopkea_Line</li>
+      <li>Slopkea_EmptyRectangle</li>
+    </styles>
+  </DrawStyleCategoryDef>
+</Defs>

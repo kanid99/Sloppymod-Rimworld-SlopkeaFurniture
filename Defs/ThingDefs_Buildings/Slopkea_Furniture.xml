@@ -6,9 +6,6 @@
     <category>Building</category>
     <designationCategory>Furniture</designationCategory>
     <minifiedDef>MinifiedThing</minifiedDef>
-    <thingCategories>
-      <li>BuildingsFurniture</li>
-    </thingCategories>
     <altitudeLayer>Building</altitudeLayer>
     <drawerType>MapMeshOnly</drawerType>
     <size>(1,1)</size>
@@ -31,7 +28,7 @@
       <graphicClass>Graphic_Single</graphicClass>
       <drawSize>(1,1)</drawSize>
     </graphicData>
-    <placingDraggableDimensions>2</placingDraggableDimensions>
+    <drawStyleCategory>Slopkea_Area</drawStyleCategory>
     <rotatable>false</rotatable>
     <passability>PassThroughOnly</passability>
     <pathCost>42</pathCost>
@@ -71,7 +68,7 @@
       <shaderType>CutoutComplex</shaderType>
       <drawSize>(1,1)</drawSize>
     </graphicData>
-    <placingDraggableDimensions>1</placingDraggableDimensions>
+    <drawStyleCategory>Slopkea_Line</drawStyleCategory>
     <rotatable>true</rotatable>
     <defaultPlacingRot>South</defaultPlacingRot>
     <passability>PassThroughOnly</passability>
@@ -177,7 +174,7 @@
       <shaderType>CutoutComplex</shaderType>
       <drawSize>(1,1)</drawSize>
     </graphicData>
-    <placingDraggableDimensions>2</placingDraggableDimensions>
+    <drawStyleCategory>Slopkea_Area</drawStyleCategory>
     <rotatable>true</rotatable>
     <defaultPlacingRot>North</defaultPlacingRot>
     <hasInteractionCell>true</hasInteractionCell>
@@ -216,7 +213,7 @@
       <shaderType>CutoutComplex</shaderType>
       <drawSize>(1,1)</drawSize>
     </graphicData>
-    <placingDraggableDimensions>1</placingDraggableDimensions>
+    <drawStyleCategory>Slopkea_Line</drawStyleCategory>
     <rotatable>true</rotatable>
     <defaultPlacingRot>South</defaultPlacingRot>
     <passability>PassThroughOnly</passability>
@@ -281,7 +278,7 @@
       <drawSize>(1,1)</drawSize>
     </graphicData>
     <altitudeLayer>FloorEmplacement</altitudeLayer>
-    <placingDraggableDimensions>2</placingDraggableDimensions>
+    <drawStyleCategory>Slopkea_Area</drawStyleCategory>
     <rotatable>false</rotatable>
     <passability>Standable</passability>
     <pathCost>0</pathCost>
@@ -309,7 +306,7 @@
   <!-- SKÅPKÖK: kitchen run modules. Any modules facing the same way join into one
        counter. Rotation is the way the FRONT faces, as for every Slopkea piece. -->
   <ThingDef Name="SlopkeaKitchenBase" ParentName="SlopkeaFurnitureBase" Abstract="True">
-    <placingDraggableDimensions>1</placingDraggableDimensions>
+    <drawStyleCategory>Slopkea_Line</drawStyleCategory>
     <rotatable>true</rotatable>
     <defaultPlacingRot>South</defaultPlacingRot>
     <passability>PassThroughOnly</passability>
@@ -460,7 +457,7 @@
       <shaderType>CutoutComplex</shaderType>
       <drawSize>(1,1)</drawSize>
     </graphicData>
-    <placingDraggableDimensions>1</placingDraggableDimensions>
+    <drawStyleCategory>Slopkea_Line</drawStyleCategory>
     <rotatable>true</rotatable>
     <defaultPlacingRot>South</defaultPlacingRot>
     <passability>PassThroughOnly</passability>
@@ -528,7 +525,7 @@
       <shaderType>CutoutComplex</shaderType>
       <drawSize>(1,1)</drawSize>
     </graphicData>
-    <placingDraggableDimensions>1</placingDraggableDimensions>
+    <drawStyleCategory>Slopkea_Line</drawStyleCategory>
     <rotatable>true</rotatable>
     <defaultPlacingRot>South</defaultPlacingRot>
     <passability>PassThroughOnly</passability>
@@ -565,7 +562,7 @@
       <shaderType>CutoutComplex</shaderType>
       <drawSize>(1,1)</drawSize>
     </graphicData>
-    <placingDraggableDimensions>1</placingDraggableDimensions>
+    <drawStyleCategory>Slopkea_Line</drawStyleCategory>
     <rotatable>true</rotatable>
     <defaultPlacingRot>South</defaultPlacingRot>
     <passability>PassThroughOnly</passability>
@@ -625,7 +622,7 @@
       <shaderType>CutoutComplex</shaderType>
       <drawSize>(1,1)</drawSize>
     </graphicData>
-    <placingDraggableDimensions>1</placingDraggableDimensions>
+    <drawStyleCategory>Slopkea_Line</drawStyleCategory>
     <rotatable>false</rotatable>
     <passability>PassThroughOnly</passability>
     <pathCost>60</pathCost>
@@ -661,7 +658,7 @@
       <drawSize>(1,1)</drawSize>
     </graphicData>
     <altitudeLayer>FloorEmplacement</altitudeLayer>
-    <placingDraggableDimensions>2</placingDraggableDimensions>
+    <drawStyleCategory>Slopkea_Area</drawStyleCategory>
     <rotatable>false</rotatable>
     <passability>Standable</passability>
     <pathCost>20</pathCost>

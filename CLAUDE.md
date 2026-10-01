@@ -39,6 +39,9 @@ pulls it in place, so every commit on `main` is what the game loads next.
   RimWorld loads the DLL, not the source. Rebuild it
   (`dotnet build -c Release` in `Source/SlopkeaFurniture/`) and commit it in the
   same commit as any C# change.
+- **Check defs against the game before committing**: `dotnet run --project
+  Source/DefCheck -- Defs/*.xml Defs/*/*.xml`. It flags any XML field RimWorld
+  1.6 doesn't have (the red "doesn't correspond to any field" errors).
 - Keep `packageId` unchanged: saves and RimSort key on it.
 
 ## Art
