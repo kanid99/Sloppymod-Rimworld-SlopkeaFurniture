@@ -76,7 +76,7 @@ def render(scene, colors, size, cell_px=CELL, bg=(92, 84, 72), rugs=()):
     z up; rugs: a set of cells, drawn underneath. size in cells."""
     from draw_modular import desk_path, rug_path, shelf_path
     w, h = size
-    out = Image.new("RGBA", (w * cell_px, h * cell_px), bg + (255,))
+    out = Image.new("RGBA", (w * cell_px, h * cell_px), (bg + (255,)) if bg else (0, 0, 0, 0))
     rugs = set(rugs)
     tiles = [((x, z), tinted(rug_path(bits_index(rugs, (x, z)), rug_corners(rugs, (x, z))),
                              colors.get("rug", (160, 60, 50)))) for x, z in rugs]
