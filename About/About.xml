@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ModMetaData>
+  <name>Slopkea Furniture</name>
+  <author>kanid99</author>
+  <packageId>kanid99.slopkeafurniture</packageId>
+  <supportedVersions>
+    <li>1.6</li>
+  </supportedVersions>
+  <description>Flat-pack furniture for the discerning rimworlder. Some assembly required.
+
+- Everything is stuffable: build it out of whatever you have lying around.
+- BÖRKSTÅD modular sectional: place seats in a line, L or U. Backrests, armrests and corners sort themselves out.
+- GLÖMSTRÄK dining table: drag out any shape you like. Every cell joins into one seamless table.</description>
+</ModMetaData>

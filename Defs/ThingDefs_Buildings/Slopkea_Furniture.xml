@@ -1,0 +1,690 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Defs>
+
+  <!-- Every Slopkea piece inherits from this: always stuffable, always flat-pack (minifiable). -->
+  <ThingDef Name="SlopkeaFurnitureBase" ParentName="FurnitureWithQualityBase" Abstract="True">
+    <category>Building</category>
+    <designationCategory>Furniture</designationCategory>
+    <minifiedDef>MinifiedThing</minifiedDef>
+    <thingCategories>
+      <li>BuildingsFurniture</li>
+    </thingCategories>
+    <altitudeLayer>Building</altitudeLayer>
+    <drawerType>MapMeshOnly</drawerType>
+    <size>(1,1)</size>
+    <useHitPoints>true</useHitPoints>
+    <socialPropernessMatters>true</socialPropernessMatters>
+    <constructionSkillPrerequisite>2</constructionSkillPrerequisite>
+    <tradeTags>
+      <li>Furniture</li>
+    </tradeTags>
+  </ThingDef>
+
+  <!-- GLÖMSTRÄK: one cell of a table. Drag out an area and it merges into one table. -->
+  <ThingDef ParentName="SlopkeaFurnitureBase">
+    <defName>Slopkea_DiningTable</defName>
+    <label>GLÖMSTRÄK table segment</label>
+    <description>A single flat-pack table panel. Drag out any shape - rectangles, L's, U's, a crude outline of Sweden - and neighbouring panels lock together into one seamless dining table. Pawns can eat at every edge.</description>
+    <thingClass>SlopkeaFurniture.Building_SlopkeaTable</thingClass>
+    <graphicData>
+      <texPath>Things/Building/Furniture/Slopkea/Table/Slopkea_Table_0</texPath>
+      <graphicClass>Graphic_Single</graphicClass>
+      <drawSize>(1,1)</drawSize>
+    </graphicData>
+    <placingDraggableDimensions>2</placingDraggableDimensions>
+    <rotatable>false</rotatable>
+    <passability>PassThroughOnly</passability>
+    <pathCost>42</pathCost>
+    <fillPercent>0.4</fillPercent>
+    <castEdgeShadows>true</castEdgeShadows>
+    <staticSunShadowHeight>0.20</staticSunShadowHeight>
+    <surfaceType>Eat</surfaceType>
+    <stuffCategories>
+      <li>Metallic</li>
+      <li>Woody</li>
+      <li>Stony</li>
+    </stuffCategories>
+    <costStuffCount>12</costStuffCount>
+    <statBases>
+      <MaxHitPoints>50</MaxHitPoints>
+      <WorkToBuild>350</WorkToBuild>
+      <Mass>4</Mass>
+      <Flammability>1.0</Flammability>
+      <Beauty>0.5</Beauty>
+    </statBases>
+    <comps>
+      <li>
+        <compClass>CompGatherSpot</compClass>
+      </li>
+    </comps>
+  </ThingDef>
+
+  <!-- BÖRKSTÅD: one seat of a modular sectional couch. -->
+  <ThingDef ParentName="SlopkeaFurnitureBase">
+    <defName>Slopkea_SectionalSeat</defName>
+    <label>BÖRKSTÅD sectional seat</label>
+    <description>One seat of a modular sectional. Line them up, turn a corner, make a conversation pit. Backrests follow each seat's facing, armrests appear at the open ends and corners wrap themselves. Doubles as a comfy dining chair.</description>
+    <thingClass>SlopkeaFurniture.Building_SlopkeaSectional</thingClass>
+    <graphicData>
+      <texPath>Things/Building/Furniture/Slopkea/Sectional/Slopkea_Sectional</texPath>
+      <graphicClass>Graphic_Multi</graphicClass>
+      <shaderType>CutoutComplex</shaderType>
+      <drawSize>(1,1)</drawSize>
+    </graphicData>
+    <placingDraggableDimensions>1</placingDraggableDimensions>
+    <rotatable>true</rotatable>
+    <defaultPlacingRot>South</defaultPlacingRot>
+    <passability>PassThroughOnly</passability>
+    <pathCost>30</pathCost>
+    <fillPercent>0.4</fillPercent>
+    <stuffCategories>
+      <li>Fabric</li>
+      <li>Leathery</li>
+      <li>Woody</li>
+      <li>Metallic</li>
+      <li>Stony</li>
+    </stuffCategories>
+    <costStuffCount>45</costStuffCount>
+    <statBases>
+      <MaxHitPoints>80</MaxHitPoints>
+      <WorkToBuild>1000</WorkToBuild>
+      <Mass>10</Mass>
+      <Flammability>1.0</Flammability>
+      <Beauty>2</Beauty>
+      <Comfort>0.75</Comfort>
+    </statBases>
+    <building>
+      <isSittable>true</isSittable>
+    </building>
+  </ThingDef>
+
+  <!-- GUNGVIK: rocking chairs. They rock while someone sits in them. -->
+  <ThingDef Name="SlopkeaRockingChairBase" ParentName="SlopkeaFurnitureBase" Abstract="True">
+    <thingClass>SlopkeaFurniture.Building_SlopkeaRockingChair</thingClass>
+    <!-- Real time, not map mesh: the chair moves while it rocks. -->
+    <drawerType>RealtimeOnly</drawerType>
+    <rotatable>true</rotatable>
+    <defaultPlacingRot>South</defaultPlacingRot>
+    <passability>PassThroughOnly</passability>
+    <pathCost>30</pathCost>
+    <fillPercent>0.4</fillPercent>
+    <building>
+      <isSittable>true</isSittable>
+    </building>
+  </ThingDef>
+
+  <ThingDef ParentName="SlopkeaRockingChairBase">
+    <defName>Slopkea_RockingChairWood</defName>
+    <label>GUNGVIK wooden rocking chair</label>
+    <description>A slatted rocking chair, all one wood, with spindles up the back. Rocks gently while someone sits in it. Assembly requires the included hex key and no fewer than three attempts.</description>
+    <graphicData>
+      <texPath>Things/Building/Furniture/Slopkea/RockingChair/Slopkea_RockingChairWood</texPath>
+      <graphicClass>Graphic_Multi</graphicClass>
+      <drawSize>(1,1)</drawSize>
+    </graphicData>
+    <stuffCategories>
+      <li>Woody</li>
+    </stuffCategories>
+    <costStuffCount>50</costStuffCount>
+    <statBases>
+      <MaxHitPoints>70</MaxHitPoints>
+      <WorkToBuild>1100</WorkToBuild>
+      <Mass>6</Mass>
+      <Flammability>1.0</Flammability>
+      <Beauty>3</Beauty>
+      <Comfort>0.7</Comfort>
+    </statBases>
+  </ThingDef>
+
+  <ThingDef ParentName="SlopkeaRockingChairBase">
+    <defName>Slopkea_RockingChairCloth</defName>
+    <label>GUNGVIK glider rocker</label>
+    <description>An overstuffed nursery glider: channel-tufted back, pillow arms and a deep seat cushion on a white painted frame. The upholstery is whatever fabric or leather it is built from. Glides smoothly back and forth while someone sits in it. Ottoman sold separately, eventually.</description>
+    <thingClass>SlopkeaFurniture.Building_SlopkeaGlider</thingClass>
+    <graphicData>
+      <texPath>Things/Building/Furniture/Slopkea/RockingChair/Slopkea_RockingChairCloth</texPath>
+      <graphicClass>Graphic_Multi</graphicClass>
+      <shaderType>CutoutComplex</shaderType>
+      <drawSize>(1,1)</drawSize>
+    </graphicData>
+    <stuffCategories>
+      <li>Fabric</li>
+      <li>Leathery</li>
+    </stuffCategories>
+    <costStuffCount>40</costStuffCount>
+    <costList>
+      <WoodLog>25</WoodLog>
+    </costList>
+    <statBases>
+      <MaxHitPoints>80</MaxHitPoints>
+      <WorkToBuild>1400</WorkToBuild>
+      <Mass>7</Mass>
+      <Flammability>1.0</Flammability>
+      <Beauty>4</Beauty>
+      <Comfort>0.85</Comfort>
+    </statBases>
+  </ThingDef>
+
+  <!-- LÅNGBORD: one cell of a drag-to-shape desk. Each cell is a research bench. -->
+  <ThingDef ParentName="SlopkeaFurnitureBase">
+    <defName>Slopkea_Desk</defName>
+    <label>LÅNGBORD desk segment</label>
+    <description>A flat-pack desk panel. Drag out any shape - a long bench, an L, a U around a very important chair - and neighbouring panels join into one desk. Every panel is a research spot, worked from its front.</description>
+    <thingClass>SlopkeaFurniture.Building_SlopkeaDesk</thingClass>
+    <graphicData>
+      <texPath>Things/Building/Furniture/Slopkea/Desk/Slopkea_Desk_0</texPath>
+      <graphicClass>Graphic_Single</graphicClass>
+      <shaderType>CutoutComplex</shaderType>
+      <drawSize>(1,1)</drawSize>
+    </graphicData>
+    <placingDraggableDimensions>2</placingDraggableDimensions>
+    <rotatable>true</rotatable>
+    <defaultPlacingRot>North</defaultPlacingRot>
+    <hasInteractionCell>true</hasInteractionCell>
+    <interactionCellOffset>(0,0,-1)</interactionCellOffset>
+    <passability>PassThroughOnly</passability>
+    <pathCost>42</pathCost>
+    <fillPercent>0.4</fillPercent>
+    <castEdgeShadows>true</castEdgeShadows>
+    <staticSunShadowHeight>0.20</staticSunShadowHeight>
+    <surfaceType>Item</surfaceType>
+    <stuffCategories>
+      <li>Woody</li>
+      <li>Metallic</li>
+      <li>Stony</li>
+    </stuffCategories>
+    <costStuffCount>20</costStuffCount>
+    <statBases>
+      <MaxHitPoints>60</MaxHitPoints>
+      <WorkToBuild>900</WorkToBuild>
+      <Mass>6</Mass>
+      <Flammability>1.0</Flammability>
+      <Beauty>0.5</Beauty>
+      <ResearchSpeedFactor>0.9</ResearchSpeedFactor>
+    </statBases>
+  </ThingDef>
+
+  <!-- KUBBLÅ: cube shelving. Units facing the same way join into one run. -->
+  <ThingDef ParentName="SlopkeaFurnitureBase">
+    <defName>Slopkea_CubeShelf</defName>
+    <label>KUBBLÅ cube shelf</label>
+    <description>A tower of two cubes. Line them up and they join into one long unit with shared walls. Each cube holds a stack of whatever you ask it to. Fabric bins not included.</description>
+    <thingClass>SlopkeaFurniture.Building_SlopkeaShelf</thingClass>
+    <graphicData>
+      <texPath>Things/Building/Furniture/Slopkea/Shelf/Slopkea_Shelf</texPath>
+      <graphicClass>Graphic_Multi</graphicClass>
+      <shaderType>CutoutComplex</shaderType>
+      <drawSize>(1,1)</drawSize>
+    </graphicData>
+    <placingDraggableDimensions>1</placingDraggableDimensions>
+    <rotatable>true</rotatable>
+    <defaultPlacingRot>South</defaultPlacingRot>
+    <passability>PassThroughOnly</passability>
+    <pathCost>50</pathCost>
+    <fillPercent>0.5</fillPercent>
+    <castEdgeShadows>true</castEdgeShadows>
+    <staticSunShadowHeight>0.5</staticSunShadowHeight>
+    <surfaceType>Item</surfaceType>
+    <canOverlapZones>false</canOverlapZones>
+    <stuffCategories>
+      <li>Woody</li>
+      <li>Metallic</li>
+      <li>Stony</li>
+    </stuffCategories>
+    <costStuffCount>25</costStuffCount>
+    <statBases>
+      <MaxHitPoints>80</MaxHitPoints>
+      <WorkToBuild>600</WorkToBuild>
+      <Mass>8</Mass>
+      <Flammability>1.0</Flammability>
+      <Beauty>0.5</Beauty>
+    </statBases>
+    <inspectorTabs>
+      <li>ITab_Storage</li>
+    </inspectorTabs>
+    <building>
+      <preventDeteriorationOnTop>true</preventDeteriorationOnTop>
+      <ignoreStoredThingsBeauty>true</ignoreStoredThingsBeauty>
+      <maxItemsInCell>2</maxItemsInCell>
+      <blueprintClass>Blueprint_Storage</blueprintClass>
+      <fixedStorageSettings>
+        <filter>
+          <categories>
+            <li>Root</li>
+          </categories>
+        </filter>
+      </fixedStorageSettings>
+      <defaultStorageSettings>
+        <priority>Preferred</priority>
+        <filter>
+          <categories>
+            <li>Manufactured</li>
+            <li>ResourcesRaw</li>
+            <li>Items</li>
+            <li>Weapons</li>
+            <li>Apparel</li>
+          </categories>
+        </filter>
+      </defaultStorageSettings>
+    </building>
+  </ThingDef>
+
+  <!-- MATTBIT: one cell of a drag-to-shape rug. Furniture stands on it. -->
+  <ThingDef ParentName="SlopkeaFurnitureBase">
+    <defName>Slopkea_Rug</defName>
+    <label>MATTBIT rug segment</label>
+    <description>A square of rug. Drag out any shape and the squares join into one rug, with a border that follows the outline and turns every corner. Furniture can stand on it. Vacuuming not included.</description>
+    <thingClass>SlopkeaFurniture.Building_SlopkeaRug</thingClass>
+    <graphicData>
+      <texPath>Things/Building/Furniture/Slopkea/Rug/Slopkea_Rug_0_0</texPath>
+      <graphicClass>Graphic_Single</graphicClass>
+      <drawSize>(1,1)</drawSize>
+    </graphicData>
+    <altitudeLayer>FloorEmplacement</altitudeLayer>
+    <placingDraggableDimensions>2</placingDraggableDimensions>
+    <rotatable>false</rotatable>
+    <passability>Standable</passability>
+    <pathCost>0</pathCost>
+    <fillPercent>0</fillPercent>
+    <castEdgeShadows>false</castEdgeShadows>
+    <staticSunShadowHeight>0</staticSunShadowHeight>
+    <clearBuildingArea>false</clearBuildingArea>
+    <stuffCategories>
+      <li>Fabric</li>
+      <li>Leathery</li>
+    </stuffCategories>
+    <costStuffCount>10</costStuffCount>
+    <statBases>
+      <MaxHitPoints>40</MaxHitPoints>
+      <WorkToBuild>300</WorkToBuild>
+      <Mass>1</Mass>
+      <Flammability>1.0</Flammability>
+      <Beauty>2</Beauty>
+    </statBases>
+    <building>
+      <isEdifice>false</isEdifice>
+    </building>
+  </ThingDef>
+
+  <!-- SKÅPKÖK: kitchen run modules. Any modules facing the same way join into one
+       counter. Rotation is the way the FRONT faces, as for every Slopkea piece. -->
+  <ThingDef Name="SlopkeaKitchenBase" ParentName="SlopkeaFurnitureBase" Abstract="True">
+    <placingDraggableDimensions>1</placingDraggableDimensions>
+    <rotatable>true</rotatable>
+    <defaultPlacingRot>South</defaultPlacingRot>
+    <passability>PassThroughOnly</passability>
+    <pathCost>50</pathCost>
+    <fillPercent>0.5</fillPercent>
+    <castEdgeShadows>true</castEdgeShadows>
+    <staticSunShadowHeight>0.35</staticSunShadowHeight>
+    <surfaceType>Item</surfaceType>
+    <stuffCategories>
+      <li>Woody</li>
+      <li>Metallic</li>
+    </stuffCategories>
+    <costStuffCount>30</costStuffCount>
+  </ThingDef>
+
+  <ThingDef ParentName="SlopkeaKitchenBase">
+    <defName>Slopkea_Cabinet</defName>
+    <label>SKÅPKÖK kitchen cabinet</label>
+    <description>A stretch of worktop over cupboards. Joins any SKÅPKÖK module beside it into one kitchen run, and the cupboards store food.</description>
+    <thingClass>SlopkeaFurniture.Building_SlopkeaCabinet</thingClass>
+    <graphicData>
+      <texPath>Things/Building/Furniture/Slopkea/Kitchen/Slopkea_Cabinet</texPath>
+      <graphicClass>Graphic_Multi</graphicClass>
+      <shaderType>CutoutComplex</shaderType>
+      <drawSize>(1,1)</drawSize>
+    </graphicData>
+    <costList>
+      <Steel>5</Steel>
+    </costList>
+    <statBases>
+      <MaxHitPoints>90</MaxHitPoints>
+      <WorkToBuild>900</WorkToBuild>
+      <Mass>12</Mass>
+      <Flammability>1.0</Flammability>
+      <Beauty>1</Beauty>
+    </statBases>
+    <canOverlapZones>false</canOverlapZones>
+    <inspectorTabs>
+      <li>ITab_Storage</li>
+    </inspectorTabs>
+    <building>
+      <preventDeteriorationOnTop>true</preventDeteriorationOnTop>
+      <ignoreStoredThingsBeauty>true</ignoreStoredThingsBeauty>
+      <maxItemsInCell>2</maxItemsInCell>
+      <blueprintClass>Blueprint_Storage</blueprintClass>
+      <fixedStorageSettings>
+        <filter>
+          <categories>
+            <li>Root</li>
+          </categories>
+        </filter>
+      </fixedStorageSettings>
+      <defaultStorageSettings>
+        <priority>Preferred</priority>
+        <filter>
+          <categories>
+            <li>Foods</li>
+          </categories>
+        </filter>
+      </defaultStorageSettings>
+    </building>
+  </ThingDef>
+
+  <ThingDef ParentName="SlopkeaKitchenBase">
+    <defName>Slopkea_Sink</defName>
+    <label>SKÅPKÖK sink</label>
+    <description>A counter module with a steel basin. Joins the kitchen run, and somebody might even wash up, which keeps the room a little cleaner.</description>
+    <thingClass>SlopkeaFurniture.Building_SlopkeaSink</thingClass>
+    <graphicData>
+      <texPath>Things/Building/Furniture/Slopkea/Kitchen/Slopkea_Sink</texPath>
+      <graphicClass>Graphic_Multi</graphicClass>
+      <shaderType>CutoutComplex</shaderType>
+      <drawSize>(1,1)</drawSize>
+    </graphicData>
+    <costList>
+      <Steel>20</Steel>
+    </costList>
+    <statBases>
+      <MaxHitPoints>90</MaxHitPoints>
+      <WorkToBuild>1200</WorkToBuild>
+      <Mass>14</Mass>
+      <Flammability>1.0</Flammability>
+      <Beauty>1</Beauty>
+      <Cleanliness>0.6</Cleanliness>
+    </statBases>
+  </ThingDef>
+
+  <ThingDef ParentName="SlopkeaKitchenBase">
+    <defName>Slopkea_Hob</defName>
+    <label>SKÅPKÖK hob</label>
+    <description>An electric hob built into the kitchen run. Cooks everything an electric stove cooks, from the front of the counter.</description>
+    <thingClass>SlopkeaFurniture.Building_SlopkeaHob</thingClass>
+    <graphicData>
+      <texPath>Things/Building/Furniture/Slopkea/Kitchen/Slopkea_Hob</texPath>
+      <graphicClass>Graphic_Multi</graphicClass>
+      <shaderType>CutoutComplex</shaderType>
+      <drawSize>(1,1)</drawSize>
+    </graphicData>
+    <costList>
+      <Steel>40</Steel>
+      <ComponentIndustrial>2</ComponentIndustrial>
+    </costList>
+    <statBases>
+      <MaxHitPoints>120</MaxHitPoints>
+      <WorkToBuild>2000</WorkToBuild>
+      <Mass>20</Mass>
+      <Flammability>1.0</Flammability>
+      <Beauty>1</Beauty>
+      <WorkTableWorkSpeedFactor>1</WorkTableWorkSpeedFactor>
+    </statBases>
+    <hasInteractionCell>true</hasInteractionCell>
+    <!-- (0,0,1): the cook stands in front, the side the hob faces. -->
+    <interactionCellOffset>(0,0,1)</interactionCellOffset>
+    <researchPrerequisites>
+      <li>Electricity</li>
+    </researchPrerequisites>
+    <inspectorTabs>
+      <li>ITab_Bills</li>
+    </inspectorTabs>
+    <building>
+      <isMealSource>true</isMealSource>
+      <heatPerTickWhileWorking>0.10</heatPerTickWhileWorking>
+    </building>
+    <comps>
+      <li Class="CompProperties_Power">
+        <compClass>CompPowerTrader</compClass>
+        <basePowerConsumption>350</basePowerConsumption>
+        <shortCircuitInRain>true</shortCircuitInRain>
+      </li>
+      <li Class="CompProperties_Flickable" />
+      <li Class="CompProperties_Breakdownable" />
+    </comps>
+  </ThingDef>
+
+  <!-- BILLY-ish: HYLLVIK bookcase. A vanilla bookcase in every respect but its
+       looks: it holds, shows and lends out books the vanilla way, and units facing
+       the same way join into one run. -->
+  <ThingDef ParentName="SlopkeaFurnitureBase">
+    <defName>Slopkea_Bookcase</defName>
+    <label>HYLLVIK bookcase</label>
+    <description>A tall bookcase with three empty shelves, waiting for books. Line them up and they join into one long wall of shelving. Works just like any bookcase: books kept here are shown on the shelves and help readers in the room.</description>
+    <thingClass>SlopkeaFurniture.Building_SlopkeaBookcase</thingClass>
+    <!-- Map mesh for the case, real time for vanilla's book drawing. -->
+    <drawerType>MapMeshAndRealTime</drawerType>
+    <graphicData>
+      <texPath>Things/Building/Furniture/Slopkea/Bookcase/Slopkea_Bookcase</texPath>
+      <graphicClass>Graphic_Multi</graphicClass>
+      <shaderType>CutoutComplex</shaderType>
+      <drawSize>(1,1)</drawSize>
+    </graphicData>
+    <placingDraggableDimensions>1</placingDraggableDimensions>
+    <rotatable>true</rotatable>
+    <defaultPlacingRot>South</defaultPlacingRot>
+    <passability>PassThroughOnly</passability>
+    <pathCost>50</pathCost>
+    <fillPercent>0.6</fillPercent>
+    <castEdgeShadows>true</castEdgeShadows>
+    <staticSunShadowHeight>0.6</staticSunShadowHeight>
+    <canOverlapZones>false</canOverlapZones>
+    <stuffCategories>
+      <li>Woody</li>
+      <li>Metallic</li>
+      <li>Stony</li>
+    </stuffCategories>
+    <costStuffCount>30</costStuffCount>
+    <statBases>
+      <MaxHitPoints>80</MaxHitPoints>
+      <WorkToBuild>700</WorkToBuild>
+      <Mass>10</Mass>
+      <Flammability>1.0</Flammability>
+      <Beauty>2</Beauty>
+    </statBases>
+    <inspectorTabs>
+      <li>ITab_ContentsBooks</li>
+      <li>ITab_Storage</li>
+    </inspectorTabs>
+    <building>
+      <maxItemsInCell>4</maxItemsInCell>
+      <bookendGraphicEast>
+        <texPath>Things/Building/Furniture/Slopkea/Bookcase/Slopkea_BookendEast</texPath>
+        <graphicClass>Graphic_Single</graphicClass>
+        <drawSize>(0.25,0.25)</drawSize>
+      </bookendGraphicEast>
+      <bookendGraphicNorth>
+        <texPath>Things/Building/Furniture/Slopkea/Bookcase/Slopkea_BookendNorth</texPath>
+        <graphicClass>Graphic_Single</graphicClass>
+        <drawSize>(0.25,0.25)</drawSize>
+      </bookendGraphicNorth>
+      <fixedStorageSettings>
+        <filter>
+          <categories>
+            <li>Books</li>
+          </categories>
+        </filter>
+      </fixedStorageSettings>
+      <defaultStorageSettings>
+        <priority>Preferred</priority>
+        <filter>
+          <categories>
+            <li>Books</li>
+          </categories>
+        </filter>
+      </defaultStorageSettings>
+    </building>
+  </ThingDef>
+
+  <!-- BÄNKLAG: backless bench. Benches facing the same way join into one pew. -->
+  <ThingDef ParentName="SlopkeaFurnitureBase">
+    <defName>Slopkea_Bench</defName>
+    <label>BÄNKLAG bench</label>
+    <description>A plank bench with no back and no pretensions. Line them up and they join into one long pew - for dining halls, churches, or making everyone sit uncomfortably close.</description>
+    <thingClass>SlopkeaFurniture.Building_SlopkeaBench</thingClass>
+    <graphicData>
+      <texPath>Things/Building/Furniture/Slopkea/Bench/Slopkea_Bench</texPath>
+      <graphicClass>Graphic_Multi</graphicClass>
+      <shaderType>CutoutComplex</shaderType>
+      <drawSize>(1,1)</drawSize>
+    </graphicData>
+    <placingDraggableDimensions>1</placingDraggableDimensions>
+    <rotatable>true</rotatable>
+    <defaultPlacingRot>South</defaultPlacingRot>
+    <passability>PassThroughOnly</passability>
+    <pathCost>30</pathCost>
+    <fillPercent>0.3</fillPercent>
+    <stuffCategories>
+      <li>Woody</li>
+      <li>Metallic</li>
+      <li>Stony</li>
+    </stuffCategories>
+    <costStuffCount>20</costStuffCount>
+    <statBases>
+      <MaxHitPoints>60</MaxHitPoints>
+      <WorkToBuild>400</WorkToBuild>
+      <Mass>5</Mass>
+      <Flammability>1.0</Flammability>
+      <Beauty>0.5</Beauty>
+      <Comfort>0.45</Comfort>
+    </statBases>
+    <building>
+      <isSittable>true</isSittable>
+    </building>
+  </ThingDef>
+
+  <!-- GARDEROB: wardrobe. Wardrobes facing the same way join into one fitted run. -->
+  <ThingDef ParentName="SlopkeaFurnitureBase">
+    <defName>Slopkea_Wardrobe</defName>
+    <label>GARDEROB wardrobe</label>
+    <description>A tall two-door wardrobe for clothes and armour. Line them up and they join into one wall of fitted wardrobes. One door will never quite close.</description>
+    <thingClass>SlopkeaFurniture.Building_SlopkeaWardrobe</thingClass>
+    <graphicData>
+      <texPath>Things/Building/Furniture/Slopkea/Wardrobe/Slopkea_Wardrobe</texPath>
+      <graphicClass>Graphic_Multi</graphicClass>
+      <shaderType>CutoutComplex</shaderType>
+      <drawSize>(1,1)</drawSize>
+    </graphicData>
+    <placingDraggableDimensions>1</placingDraggableDimensions>
+    <rotatable>true</rotatable>
+    <defaultPlacingRot>South</defaultPlacingRot>
+    <passability>PassThroughOnly</passability>
+    <pathCost>50</pathCost>
+    <fillPercent>0.7</fillPercent>
+    <castEdgeShadows>true</castEdgeShadows>
+    <staticSunShadowHeight>0.7</staticSunShadowHeight>
+    <surfaceType>Item</surfaceType>
+    <canOverlapZones>false</canOverlapZones>
+    <stuffCategories>
+      <li>Woody</li>
+      <li>Metallic</li>
+    </stuffCategories>
+    <costStuffCount>40</costStuffCount>
+    <statBases>
+      <MaxHitPoints>100</MaxHitPoints>
+      <WorkToBuild>900</WorkToBuild>
+      <Mass>15</Mass>
+      <Flammability>1.0</Flammability>
+      <Beauty>1</Beauty>
+    </statBases>
+    <inspectorTabs>
+      <li>ITab_Storage</li>
+    </inspectorTabs>
+    <building>
+      <preventDeteriorationOnTop>true</preventDeteriorationOnTop>
+      <ignoreStoredThingsBeauty>true</ignoreStoredThingsBeauty>
+      <maxItemsInCell>3</maxItemsInCell>
+      <blueprintClass>Blueprint_Storage</blueprintClass>
+      <fixedStorageSettings>
+        <filter>
+          <categories>
+            <li>Apparel</li>
+          </categories>
+        </filter>
+      </fixedStorageSettings>
+      <defaultStorageSettings>
+        <priority>Preferred</priority>
+        <filter>
+          <categories>
+            <li>Apparel</li>
+          </categories>
+        </filter>
+      </defaultStorageSettings>
+    </building>
+  </ThingDef>
+
+  <!-- VIKSKÄRM: folding room divider. Drag a line; it blocks sight but not feet. -->
+  <ThingDef ParentName="SlopkeaFurnitureBase">
+    <defName>Slopkea_Divider</defName>
+    <label>VIKSKÄRM room divider</label>
+    <description>A folding paper screen. Drag it out along a line - it turns corners - to split a room without building a wall. Blocks line of sight; people can still squeeze past.</description>
+    <thingClass>SlopkeaFurniture.Building_SlopkeaDivider</thingClass>
+    <graphicData>
+      <texPath>Things/Building/Furniture/Slopkea/Divider/Slopkea_Divider_0</texPath>
+      <graphicClass>Graphic_Single</graphicClass>
+      <shaderType>CutoutComplex</shaderType>
+      <drawSize>(1,1)</drawSize>
+    </graphicData>
+    <placingDraggableDimensions>1</placingDraggableDimensions>
+    <rotatable>false</rotatable>
+    <passability>PassThroughOnly</passability>
+    <pathCost>60</pathCost>
+    <!-- Full fillage is what blocks line of sight. -->
+    <fillPercent>1.0</fillPercent>
+    <stuffCategories>
+      <li>Woody</li>
+      <li>Metallic</li>
+    </stuffCategories>
+    <costStuffCount>10</costStuffCount>
+    <costList>
+      <Cloth>5</Cloth>
+    </costList>
+    <statBases>
+      <MaxHitPoints>40</MaxHitPoints>
+      <WorkToBuild>300</WorkToBuild>
+      <Mass>3</Mass>
+      <Flammability>1.0</Flammability>
+      <Beauty>1</Beauty>
+    </statBases>
+  </ThingDef>
+
+  <!-- ODLÅDA: raised planter bed. Drag out any shape; grows crops. -->
+  <ThingDef ParentName="SlopkeaFurnitureBase">
+    <defName>Slopkea_Planter</defName>
+    <label>ODLÅDA planter box</label>
+    <description>A raised timber bed of good soil. Drag out any shape and the beds join into one; grows anything that grows in the ground, a little better than the ground does. Indoors, it still needs light.</description>
+    <thingClass>SlopkeaFurniture.Building_SlopkeaPlanter</thingClass>
+    <graphicData>
+      <texPath>Things/Building/Furniture/Slopkea/Planter/Slopkea_Planter_0</texPath>
+      <graphicClass>Graphic_Single</graphicClass>
+      <shaderType>CutoutComplex</shaderType>
+      <drawSize>(1,1)</drawSize>
+    </graphicData>
+    <altitudeLayer>FloorEmplacement</altitudeLayer>
+    <placingDraggableDimensions>2</placingDraggableDimensions>
+    <rotatable>false</rotatable>
+    <passability>Standable</passability>
+    <pathCost>20</pathCost>
+    <fillPercent>0.2</fillPercent>
+    <castEdgeShadows>false</castEdgeShadows>
+    <staticSunShadowHeight>0</staticSunShadowHeight>
+    <stuffCategories>
+      <li>Woody</li>
+      <li>Stony</li>
+    </stuffCategories>
+    <costStuffCount>15</costStuffCount>
+    <statBases>
+      <MaxHitPoints>60</MaxHitPoints>
+      <WorkToBuild>350</WorkToBuild>
+      <Mass>8</Mass>
+      <Flammability>1.0</Flammability>
+      <Beauty>1</Beauty>
+      <Fertility>1.1</Fertility>
+    </statBases>
+    <building>
+      <sowTag>Ground</sowTag>
+      <defaultPlantToGrow>Plant_Potato</defaultPlantToGrow>
+    </building>
+  </ThingDef>
+
+</Defs>

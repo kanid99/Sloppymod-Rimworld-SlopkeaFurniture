@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Patch>
+  <!-- The hob cooks whatever the electric stove cooks, including recipes other
+       mods add, without this mod naming a single recipe. Matches abstract parents
+       too (e.g. the shared cooking base), since patches run before inheritance. -->
+  <Operation Class="PatchOperationAdd">
+    <xpath>Defs/RecipeDef[recipeUsers/li="ElectricStove"]/recipeUsers</xpath>
+    <value>
+      <li>Slopkea_Hob</li>
+    </value>
+  </Operation>
+</Patch>
