@@ -373,7 +373,7 @@
   <ThingDef ParentName="SlopkeaKitchenBase">
     <defName>Slopkea_Sink</defName>
     <label>SKÅPKÖK sink</label>
-    <description>A counter module with a steel basin. Joins the kitchen run, and somebody might even wash up, which keeps the room a little cleaner.</description>
+    <description>A counter module with a steel basin. Joins the kitchen run and keeps the room cleaner - and a clean kitchen means safer meals. With Dubs Bad Hygiene, it plumbs into the sewage system and cleans even better.</description>
     <thingClass>SlopkeaFurniture.Building_SlopkeaSink</thingClass>
     <graphicData>
       <texPath>Things/Building/Furniture/Slopkea/Kitchen/Slopkea_Sink</texPath>
@@ -682,6 +682,173 @@
       <sowTag>Ground</sowTag>
       <defaultPlantToGrow>Plant_Potato</defaultPlantToGrow>
     </building>
+  </ThingDef>
+
+  <!-- SKÅPKÖK tall modules: they join the run like the counters. -->
+  <ThingDef ParentName="SlopkeaKitchenBase">
+    <defName>Slopkea_Hutch</defName>
+    <label>SKÅPKÖK hutch</label>
+    <description>A counter with open plate shelving above it. Joins the kitchen run, and stores whatever you put on it - three stacks' worth.</description>
+    <thingClass>SlopkeaFurniture.Building_SlopkeaHutch</thingClass>
+    <graphicData>
+      <texPath>Things/Building/Furniture/Slopkea/Kitchen/Slopkea_Hutch</texPath>
+      <graphicClass>Graphic_Multi</graphicClass>
+      <shaderType>CutoutComplex</shaderType>
+      <drawSize>(1,1)</drawSize>
+    </graphicData>
+    <fillPercent>0.7</fillPercent>
+    <staticSunShadowHeight>0.7</staticSunShadowHeight>
+    <costList>
+      <Steel>5</Steel>
+    </costList>
+    <costStuffCount>45</costStuffCount>
+    <statBases>
+      <MaxHitPoints>100</MaxHitPoints>
+      <WorkToBuild>1100</WorkToBuild>
+      <Mass>16</Mass>
+      <Flammability>1.0</Flammability>
+      <Beauty>2</Beauty>
+    </statBases>
+    <canOverlapZones>false</canOverlapZones>
+    <inspectorTabs>
+      <li>ITab_Storage</li>
+    </inspectorTabs>
+    <building>
+      <preventDeteriorationOnTop>true</preventDeteriorationOnTop>
+      <ignoreStoredThingsBeauty>true</ignoreStoredThingsBeauty>
+      <maxItemsInCell>3</maxItemsInCell>
+      <blueprintClass>Blueprint_Storage</blueprintClass>
+      <fixedStorageSettings>
+        <filter>
+          <categories>
+            <li>Root</li>
+          </categories>
+        </filter>
+      </fixedStorageSettings>
+      <defaultStorageSettings>
+        <priority>Preferred</priority>
+        <filter>
+          <categories>
+            <li>Foods</li>
+            <li>Manufactured</li>
+          </categories>
+        </filter>
+      </defaultStorageSettings>
+    </building>
+  </ThingDef>
+
+  <ThingDef ParentName="SlopkeaKitchenBase">
+    <defName>Slopkea_WallOven</defName>
+    <label>SKÅPKÖK wall oven</label>
+    <description>A tall built-in oven tower with a cupboard over and a drawer under. Joins the kitchen run and cooks everything an electric stove cooks, a little faster than the hob.</description>
+    <thingClass>SlopkeaFurniture.Building_SlopkeaOven</thingClass>
+    <graphicData>
+      <texPath>Things/Building/Furniture/Slopkea/Kitchen/Slopkea_Oven</texPath>
+      <graphicClass>Graphic_Multi</graphicClass>
+      <shaderType>CutoutComplex</shaderType>
+      <drawSize>(1,1)</drawSize>
+    </graphicData>
+    <fillPercent>0.8</fillPercent>
+    <staticSunShadowHeight>0.8</staticSunShadowHeight>
+    <costList>
+      <Steel>60</Steel>
+      <ComponentIndustrial>3</ComponentIndustrial>
+    </costList>
+    <costStuffCount>40</costStuffCount>
+    <statBases>
+      <MaxHitPoints>150</MaxHitPoints>
+      <WorkToBuild>2600</WorkToBuild>
+      <Mass>30</Mass>
+      <Flammability>1.0</Flammability>
+      <Beauty>2</Beauty>
+      <WorkTableWorkSpeedFactor>1.1</WorkTableWorkSpeedFactor>
+    </statBases>
+    <hasInteractionCell>true</hasInteractionCell>
+    <!-- (0,0,1): the cook stands in front, the side the oven faces. -->
+    <interactionCellOffset>(0,0,1)</interactionCellOffset>
+    <researchPrerequisites>
+      <li>Electricity</li>
+    </researchPrerequisites>
+    <inspectorTabs>
+      <li>ITab_Bills</li>
+    </inspectorTabs>
+    <building>
+      <isMealSource>true</isMealSource>
+      <heatPerTickWhileWorking>0.12</heatPerTickWhileWorking>
+    </building>
+    <comps>
+      <li Class="CompProperties_Power">
+        <compClass>CompPowerTrader</compClass>
+        <basePowerConsumption>400</basePowerConsumption>
+        <shortCircuitInRain>true</shortCircuitInRain>
+      </li>
+      <li Class="CompProperties_Flickable" />
+      <li Class="CompProperties_Breakdownable" />
+    </comps>
+  </ThingDef>
+
+  <ThingDef ParentName="SlopkeaKitchenBase">
+    <defName>Slopkea_Fridge</defName>
+    <label>SKÅPKÖK fridge</label>
+    <description>A tall panel-fronted fridge with a freezer drawer, built into the kitchen run. Stores food, and while it has power, nothing kept in it rots.</description>
+    <thingClass>SlopkeaFurniture.Building_SlopkeaFridge</thingClass>
+    <graphicData>
+      <texPath>Things/Building/Furniture/Slopkea/Kitchen/Slopkea_Fridge</texPath>
+      <graphicClass>Graphic_Multi</graphicClass>
+      <shaderType>CutoutComplex</shaderType>
+      <drawSize>(1,1)</drawSize>
+    </graphicData>
+    <tickerType>Rare</tickerType>
+    <fillPercent>0.8</fillPercent>
+    <staticSunShadowHeight>0.8</staticSunShadowHeight>
+    <costList>
+      <Steel>50</Steel>
+      <ComponentIndustrial>3</ComponentIndustrial>
+    </costList>
+    <costStuffCount>40</costStuffCount>
+    <statBases>
+      <MaxHitPoints>150</MaxHitPoints>
+      <WorkToBuild>2400</WorkToBuild>
+      <Mass>35</Mass>
+      <Flammability>1.0</Flammability>
+      <Beauty>1</Beauty>
+    </statBases>
+    <researchPrerequisites>
+      <li>AirConditioning</li>
+    </researchPrerequisites>
+    <canOverlapZones>false</canOverlapZones>
+    <inspectorTabs>
+      <li>ITab_Storage</li>
+    </inspectorTabs>
+    <building>
+      <preventDeteriorationOnTop>true</preventDeteriorationOnTop>
+      <ignoreStoredThingsBeauty>true</ignoreStoredThingsBeauty>
+      <maxItemsInCell>3</maxItemsInCell>
+      <blueprintClass>Blueprint_Storage</blueprintClass>
+      <fixedStorageSettings>
+        <filter>
+          <categories>
+            <li>Foods</li>
+          </categories>
+        </filter>
+      </fixedStorageSettings>
+      <defaultStorageSettings>
+        <priority>Important</priority>
+        <filter>
+          <categories>
+            <li>Foods</li>
+          </categories>
+        </filter>
+      </defaultStorageSettings>
+    </building>
+    <comps>
+      <li Class="CompProperties_Power">
+        <compClass>CompPowerTrader</compClass>
+        <basePowerConsumption>150</basePowerConsumption>
+      </li>
+      <li Class="CompProperties_Flickable" />
+      <li Class="CompProperties_Breakdownable" />
+    </comps>
   </ThingDef>
 
 </Defs>

@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Patch>
+  <!-- With Dubs Bad Hygiene: the SKÅPKÖK sink plumbs into Dubs' sewage network
+       (the same pipe and blockage comps Dubs' own basins and kitchen sink use)
+       and, like theirs, counts for more room cleanliness - which is what lowers
+       the room's food poisoning chance for meals cooked there. Hand-washing at it
+       is not included: that needs Dubs' own basin class. -->
+  <Operation Class="PatchOperationFindMod">
+    <mods>
+      <li>Dubs Bad Hygiene</li>
+      <li>Dubs Bad Hygiene Lite</li>
+    </mods>
+    <match Class="PatchOperationSequence">
+      <operations>
+        <li Class="PatchOperationAdd">
+          <xpath>Defs/ThingDef[defName="Slopkea_Sink"]</xpath>
+          <value>
+            <comps>
+              <li Class="DubsBadHygiene.CompProperties_Pipe">
+                <mode>Sewage</mode>
+              </li>
+              <li Class="DubsBadHygiene.CompProperties_Blockage" />
+            </comps>
+          </value>
+        </li>
+        <li Class="PatchOperationReplace">
+          <xpath>Defs/ThingDef[defName="Slopkea_Sink"]/statBases/Cleanliness</xpath>
+          <value>
+            <Cleanliness>2</Cleanliness>
+          </value>
+        </li>
+      </operations>
+    </match>
+  </Operation>
+</Patch>

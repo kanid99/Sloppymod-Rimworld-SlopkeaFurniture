@@ -393,6 +393,8 @@ def main():
     rugs = draw_modular.draw_all()
     import draw_kitchen
     draw_kitchen.draw_all()
+    import draw_kitchen_tall
+    draw_kitchen_tall.draw_all()
     import draw_more
     draw_more.draw_all()
     print(f"drew 16 table and 36 sectional variants, 2 rocking chairs, "

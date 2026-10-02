@@ -29,6 +29,18 @@ namespace SlopkeaFurniture
             return i;
         }
 
+        /// <summary>
+        /// A wall, or anything wall-like (natural rock, a full impassable block),
+        /// in the cell in direction `dir`: furniture runs flush up to it.
+        /// </summary>
+        public static bool IsWall(Thing self, IntVec3 dir)
+        {
+            IntVec3 c = self.Position + dir;
+            if (!c.InBounds(self.Map)) return false;
+            Building e = c.GetEdifice(self.Map);
+            return e != null && e != self && e.def.passability == Traversability.Impassable && e.def.fillPercent >= 0.99f;
+        }
+
         /// <summary>Force the surrounding cells to re-print so their joins update.</summary>
         public static void DirtyAround(Map map, IntVec3 center)
         {
@@ -45,9 +57,14 @@ namespace SlopkeaFurniture
         /// </summary>
         public static void PrintVariant(SectionLayer layer, Thing thing, string texPath, Shader shader)
         {
+            PrintVariant(layer, thing, texPath, shader, thing.def.Altitude);
+        }
+
+        public static void PrintVariant(SectionLayer layer, Thing thing, string texPath, Shader shader, float altitude)
+        {
             Graphic g = GraphicDatabase.Get<Graphic_Single>(texPath, shader, Vector2.one, thing.DrawColor, thing.DrawColorTwo);
             Vector3 center = thing.Position.ToVector3Shifted();
-            center.y = thing.def.Altitude;
+            center.y = altitude;
             Printer_Plane.PrintPlane(layer, center, Vector2.one, g.MatSingle);
         }
     }

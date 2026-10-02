@@ -24,8 +24,12 @@ STEEL_LIT, STEEL, STEEL_DARK = (214, 220, 226), (172, 180, 188), (104, 110, 118)
 BURNER, BURNER_RING = (40, 40, 42), (84, 84, 88)
 
 
-def kitchen_path(module, facing, cw, ccw, mask=False):
-    return f"{KITCHEN_DIR}/Slopkea_{module}_{facing}_{cw}{ccw}{'_m' if mask else ''}.png"
+def kitchen_path(module, facing, cw, ccw, mask=False, back=False):
+    """`back`: the module's back is against a wall, so it runs flush to it ("b")."""
+    return f"{KITCHEN_DIR}/Slopkea_{module}_{facing}_{cw}{ccw}{'b' if back else ''}{'_m' if mask else ''}.png"
+
+
+OPP = {"north": "south", "south": "north", "east": "west", "west": "east"}
 
 
 def book_path(facing, cw, ccw, mask=False):
@@ -61,15 +65,18 @@ def fitting(cv, module, cx, cy, sx, sy):
                             x + r * sx / min(sx, sy), y + r * sy / min(sx, sy)), BURNER_RING, tint=False)
 
 
-def draw_kitchen(module, facing, cw, ccw):
+def draw_kitchen(module, facing, cw, ccw, back=False):
     joined = joined_sides(facing, cw, ccw)
+    if back:
+        joined = joined | {OPP[facing]}     # flush to the wall behind: no lip, no outline
     open_sides = set(SIDES) - joined
     cv = Canvas()
     ow = lambda side: 0.0 if side in joined else 0.03   # carcass inset on open ends
 
     if facing in ("south", "north"):
         x0, x1 = ow("west"), 1 - ow("east")
-        top0, top1 = 0.04, (0.46 if facing == "south" else 0.62)
+        top0 = 0.0 if (back and facing == "south") else 0.04
+        top1 = 0.46 if facing == "south" else 0.62
         # Worktop, with a lit front lip. It overhangs, so it runs edge to edge.
         cv.rect((0, top0, 1, top1), STONE, tint=False)
         cv.rect((0, top0, 1, top0 + 0.025), STONE_LIT, tint=False)
@@ -90,7 +97,8 @@ def draw_kitchen(module, facing, cw, ccw):
                     cv.ellipse((kx - 0.02, top1 + 0.012, kx + 0.02, top1 + 0.052), STEEL_DARK, tint=False)
             fitting(cv, module, 0.5, (top0 + top1) / 2 + 0.01, 0.30, 0.15)
         else:
-            cv.rect((x0, top1, x1, 0.96), WALL)                  # the plain back
+            bottom = 1.0 if back else 0.96
+            cv.rect((x0, top1, x1, bottom), WALL)                # the plain back
             cv.rect((x0, top1, x1, top1 + 0.02), WALL_DARK)
             fitting(cv, module, 0.5, (top0 + top1) / 2, 0.30, 0.2)
             if module == "Sink":                                  # the tap, at the back
@@ -99,6 +107,8 @@ def draw_kitchen(module, facing, cw, ccw):
         right = facing == "east"
         y0, y1 = (0.0 if "north" in joined else 0.04), (1.0 if "south" in joined else 0.93)
         wt0, wt1 = (0.04, 0.80) if right else (0.20, 0.96)      # worktop across the depth
+        if back:                                                # flush to the wall behind
+            wt0, wt1 = (0.0, wt1) if right else (wt0, 1.0)
         cv.rect((wt0, y0, wt1, y1), STONE, tint=False)
         if "north" not in joined:
             cv.rect((wt0, y0, wt1, y0 + 0.025), STONE_LIT, tint=False)
@@ -116,7 +126,7 @@ def draw_kitchen(module, facing, cw, ccw):
             for ky in (0.28, 0.4, 0.56, 0.68):
                 cv.ellipse((kx - 0.018, ky - 0.018, kx + 0.018, ky + 0.018), STEEL_DARK, tint=False)
     cv.silhouette(open_sides)
-    cv.save(kitchen_path(module, facing, cw, ccw), kitchen_path(module, facing, cw, ccw, True))
+    cv.save(kitchen_path(module, facing, cw, ccw, back=back), kitchen_path(module, facing, cw, ccw, True, back))
 
 
 def draw_bookcase(facing, cw, ccw):
@@ -175,7 +185,8 @@ def draw_all():
         for cw in "oj":
             for ccw in "oj":
                 for m in MODULES:
-                    draw_kitchen(m, f, cw, ccw)
+                    for back in (False, True):
+                        draw_kitchen(m, f, cw, ccw, back)
                 draw_bookcase(f, cw, ccw)
         # Def graphics (blueprint, minified, ghost): the free-standing unit.
         for m in MODULES:

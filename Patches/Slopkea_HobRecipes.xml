@@ -7,6 +7,7 @@
     <xpath>Defs/RecipeDef[recipeUsers/li="ElectricStove"]/recipeUsers</xpath>
     <value>
       <li>Slopkea_Hob</li>
+      <li>Slopkea_WallOven</li>
     </value>
   </Operation>
 </Patch>

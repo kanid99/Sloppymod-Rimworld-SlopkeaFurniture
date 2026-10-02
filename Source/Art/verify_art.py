@@ -127,10 +127,19 @@ for f in FACINGS:
     for cw in "oj":
         for ccw in "oj":
             joined = {s_ for s_, st in ((CW[f], cw), (CCW[f], ccw)) if st == "j"}
-            for p, m in [(dk.kitchen_path(mod, f, cw, ccw), dk.kitchen_path(mod, f, cw, ccw, True))
-                         for mod in dk.MODULES] + [(dk.book_path(f, cw, ccw), dk.book_path(f, cw, ccw, True))]:
+            import draw_kitchen_tall as dkt
+            for p, m in [(dk.book_path(f, cw, ccw), dk.book_path(f, cw, ccw, True))]:
                 check(os.path.exists(m), f"missing {m}")
                 check_edges(p, {"north", "east", "south", "west"} - joined)
+            # Kitchen modules, counters and tall, and the wall cabinets: each also
+            # has a "back flush to a wall" variant, where the back side is joined.
+            for back in (False, True):
+                j2 = joined | ({dk.OPP[f]} if back else set())
+                for mod in dk.MODULES + dkt.TALL + ("WallCab",):
+                    p, m = dk.kitchen_path(mod, f, cw, ccw, back=back), dk.kitchen_path(mod, f, cw, ccw, True, back)
+                    check(os.path.exists(m), f"missing {m}")
+                    if os.path.exists(p):
+                        check_edges(p, {"north", "east", "south", "west"} - j2)
 kr = open("Source/SlopkeaFurniture/KitchenRun.cs").read()
 got = kr.split('Dir = "', 1)[1].split('"', 1)[0]
 check(dk.kitchen_path("Cabinet", "north", "o", "o").startswith("Textures/" + got), f"KitchenRun.cs: bad Dir {got}")
@@ -140,7 +149,8 @@ got = bc.split('TexPrefix = "', 1)[1].split('"', 1)[0]
 check(dk.book_path("north", "o", "j") == f"Textures/{got}oj_north.png", f"bookcase prefix {got} vs {dk.book_path('north', 'o', 'j')}")
 for p in (dk.BOOKEND_EAST, dk.BOOKEND_NORTH):
     check(os.path.exists(p), f"missing {p}")
-for mod in dk.MODULES:
+import draw_kitchen_tall as dkt
+for mod in dk.MODULES + dkt.TALL + ("WallCab",):
     check(f'KitchenPaths.Dir + "{mod}_"' in kr, f"KitchenRun.cs: no print path for {mod}")
 
 # Bench, wardrobe (side joins) and divider, planter (bits).
