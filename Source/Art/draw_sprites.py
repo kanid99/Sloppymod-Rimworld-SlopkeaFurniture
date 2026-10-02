@@ -10,7 +10,7 @@ import shutil
 
 from PIL import Image
 
-from slopkea_draw import (SS, CCW, CW, OPP, SEAM, TOP, TOP_LIT, WALL, WALL_DARK, FOOT,
+from slopkea_draw import (SS, LIFT, CCW, CW, OPP, SEAM, TOP, TOP_LIT, WALL, WALL_DARK, FOOT,
                           Canvas, local_rect)
 
 ROOT = "Textures/Things/Building/Furniture/Slopkea"
@@ -122,24 +122,59 @@ def draw_sectional(facing, cw, ccw):
     if cw == "j":
         cv.rect(local_rect(facing, 0.988, 1, f0, 1 - BACK), SEAM)
 
-    raised = [(local_rect(facing, 0, 1, 1 - BACK, 1), H_BACK, "back")]
-    for state, (a0, a1) in ((ccw, (0, None)), (cw, (None, 1))):
+    # Each raised part with the screen side it stands on.
+    raised = [(local_rect(facing, 0, 1, 1 - BACK, 1), H_BACK, "back", OPP[facing])]
+    for state, side, (a0, a1) in ((ccw, CCW[facing], (0, None)), (cw, CW[facing], (None, 1))):
         if state == "j":
             continue
         w = ARM if state == "a" else BACK
         span = (0, w) if a0 == 0 else (1 - w, 1)
         raised.append((local_rect(facing, span[0], span[1], 0, 1 - BACK),
-                       H_ARM if state == "a" else H_BACK, state))
+                       H_ARM if state == "a" else H_BACK, state, side))
     # Painter's order: further up the screen first, then taller last.
     raised.sort(key=lambda p: (p[0][3], p[1]))
-    for r, h, kind in raised:
+
+    def south_wall(r, h):
+        """How deep the slab's own south wall is (0 where it runs on south)."""
+        return 0 if "south" in runs_on(r) else min(LIFT * h, (r[3] - r[1]) * 0.6)
+
+    for r, h, kind, side in raised:
         cv.slab(r, h, joined=runs_on(r))
+        # The face that looks in at the seat. A slab shows its south face as its
+        # wall already; a back or arm standing east or west of the seat also
+        # shows the face it turns towards the seat, as a darker strip down that
+        # side - so the backrest's inner face reads as one band round an L.
+        inner = OPP[side]
+        if inner in ("east", "west"):
+            x0, y0, x1, y1 = r
+            w = LIFT * h * 0.45
+            sx0, sx1 = (x1 - w, x1) if inner == "east" else (x0, x0 + w)
+            top = y0 if "north" in runs_on(r) else y0 + 0.012
+            cv.rect((sx0, top, sx1, y1 - south_wall(r, h)), WALL)
+            edge = (sx0, sx0 + 0.006) if inner == "east" else (sx1 - 0.006, sx1)
+            cv.rect((edge[0], top, edge[1], y1 - south_wall(r, h)), WALL_DARK)
         if kind == "back":
             # Tufting: a row of identical buttons along the backrest.
             for a in (1 / 6, 1 / 2, 5 / 6):
                 bx0, by0, bx1, by1 = local_rect(facing, a - 0.02, a + 0.02,
                                                 1 - BACK * 0.5 - 0.02, 1 - BACK * 0.5 + 0.02)
                 cv.rect((bx0, by0 - 0.03, bx1, by1 - 0.03), SEAM)
+
+    # Corner: where the back and the wrap-round back meet, the overlap is one
+    # top surface with a mitre - a diagonal from the inside corner out to the
+    # outer corner - instead of one back's face cutting across the other.
+    for state, (a0, a1) in ((ccw, (0, BACK)), (cw, (1 - BACK, 1))):
+        if state != "c":
+            continue
+        x0, y0, x1, y1 = local_rect(facing, a0, a1, 1 - BACK, 1)
+        if y1 >= 1 - 1e-6 and "south" in open_sides:
+            y1 -= min(LIFT * H_BACK, (y1 - y0) * 0.6)      # keep the outer face below
+        cv.rect((x0, y0, x1, y1), TOP)
+        cx, cy = 0.5, 0.5
+        corners = [(x0, y0), (x1, y0), (x0, y1), (x1, y1)]
+        inner_pt = min(corners, key=lambda p: (p[0] - cx) ** 2 + (p[1] - cy) ** 2)
+        outer_pt = max(corners, key=lambda p: (p[0] - cx) ** 2 + (p[1] - cy) ** 2)
+        cv.line([inner_pt, outer_pt], 0.012, SEAM)
     cv.silhouette(open_sides)
     cv.save(sect_path(facing, cw, ccw), sect_path(facing, cw, ccw, mask=True))
 
