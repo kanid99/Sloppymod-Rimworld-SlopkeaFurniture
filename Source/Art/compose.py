@@ -17,6 +17,13 @@ def table_index(scene, cell):
     return sum(b for s, b in BITS.items() if scene.get(step(cell, s), ("",))[0] == "table")
 
 
+def sectional_back(scene, cell):
+    """Mirror of Building_SlopkeaSectional.BackJoined: a seat behind facing the other way."""
+    facing = scene[cell][1]
+    n = scene.get(step(cell, OPP[facing]))
+    return bool(n and n[0] == "sect" and n[1] == OPP[facing]) or scene.get(step(cell, OPP[facing]), ("",))[0] == "wall"
+
+
 def sectional_states(scene, cell):
     """Mirror of Building_SlopkeaSectional.SideState, for (cw, ccw)."""
     facing = scene[cell][1]
@@ -119,8 +126,9 @@ def render(scene, colors, size, cell_px=CELL, bg=(92, 84, 72), rugs=()):
                           shelf_path(thing[1], cw, ccw, True))
         else:
             cw, ccw = sectional_states(scene, (x, z))
-            tile = tinted(sect_path(thing[1], cw, ccw), colors["sect"],
-                          sect_path(thing[1], cw, ccw, mask=True))
+            b = sectional_back(scene, (x, z))
+            tile = tinted(sect_path(thing[1], cw, ccw, back=b), colors["sect"],
+                          sect_path(thing[1], cw, ccw, mask=True, back=b))
         tiles.append(((x, z), tile))
     for (x, z), tile in tiles:
         if cell_px != CELL:

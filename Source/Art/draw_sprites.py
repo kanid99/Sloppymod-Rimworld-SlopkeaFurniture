@@ -8,9 +8,9 @@ neighbours; verify_art.py checks the two agree.
 import os
 import shutil
 
-from PIL import Image
+from PIL import Image, ImageChops, ImageDraw, ImageFilter
 
-from slopkea_draw import (SS, LIFT, CCW, CW, OPP, SEAM, TOP, TOP_LIT, WALL, WALL_DARK, FOOT,
+from slopkea_draw import (C, px, SS, LIFT, CCW, CW, OPP, SEAM, TOP, TOP_LIT, WALL, WALL_DARK, FOOT,
                           Canvas, local_rect)
 
 ROOT = "Textures/Things/Building/Furniture/Slopkea"
@@ -42,8 +42,10 @@ def table_path(i):
     return f"{TABLE_DIR}/Slopkea_Table_{i}.png"
 
 
-def sect_path(facing, cw, ccw, mask=False):
-    return f"{SECT_DIR}/Slopkea_Sectional_{facing}_{cw}{ccw}{'_m' if mask else ''}.png"
+def sect_path(facing, cw, ccw, mask=False, back=False):
+    """`back`: the seat's back is joined - another seat back to back with it, or a
+    wall - so the back runs flush into it ("b")."""
+    return f"{SECT_DIR}/Slopkea_Sectional_{facing}_{cw}{ccw}{'b' if back else ''}{'_m' if mask else ''}.png"
 
 
 def draw_table(i):
@@ -83,12 +85,27 @@ def side_inset(state):
     return {"a": ARM + GAP, "c": BACK + GAP, "j": 0.0}[state]
 
 
-def draw_sectional(facing, cw, ccw):
+BACK_OUT, BACK_IN = (248, 248, 248), (192, 192, 192)   # backrest: rolled outer edge to seat side
+
+
+def draw_sectional(facing, cw, ccw, back=False):
+    """One seat of the sectional, drawn so the backrest FLOWS.
+
+    The back and arms are bands of constant width along the seat's outer edges,
+    drawn the same way whichever way they face: lightest along the rolled outer
+    edge, darker towards the seat, casting a soft shadow onto the cushion. They
+    are drawn as one union, so where two backs meet at a corner the band simply
+    carries on and the shading meets in a natural diagonal - no stitched mitre,
+    and a ring of seats reads as one continuous back all the way round.
+    """
     cv = Canvas()
     # A corner seat's front runs straight into the perpendicular seat in front of
     # it (which sees us as a joined side), so there is no silhouette there either.
     front_joined = "c" in (cw, ccw)
-    screen_state = {facing: "j" if front_joined else "open", OPP[facing]: "open", CW[facing]: cw, CCW[facing]: ccw}
+    # Back to back with another seat (or against a wall), the back runs flush:
+    # two back bands meet as one spine, their rolled edges a ridge down it.
+    screen_state = {facing: "j" if front_joined else "open", OPP[facing]: "j" if back else "open",
+                    CW[facing]: cw, CCW[facing]: ccw}
     open_sides = {s for s, st in screen_state.items() if st != "j"}
     joined_sides = set(screen_state) - open_sides
 
@@ -109,74 +126,81 @@ def draw_sectional(facing, cw, ccw):
         if "east" in open_sides:
             cv.rect((0.85, 0.90, 0.95, 1.0), FOOT, tint=False)
 
-    # Seat cushion, inset from whatever stands at each side.
-    # A corner seat's cushion runs right up to the seat in front, so the seating
-    # inside an L or U is one unbroken surface.
-    lo, hi = side_inset(ccw), 1 - side_inset(cw)
+    # The seat cushion fills the seat; the backs and arms are laid over its edges.
     f0 = 0.0 if front_joined else 0.05
-    cushion = local_rect(facing, lo, hi, f0, 1 - BACK)
+    cushion = local_rect(facing, 0, 1, f0, 1)
     cv.slab(cushion, H_CUSHION, joined=runs_on(cushion))
-    # A seam where this cushion meets the next seat's.
     if ccw == "j":
-        cv.rect(local_rect(facing, 0, 0.012, f0, 1 - BACK), SEAM)
+        cv.rect(local_rect(facing, 0, 0.012, f0, 1), SEAM)
     if cw == "j":
-        cv.rect(local_rect(facing, 0.988, 1, f0, 1 - BACK), SEAM)
+        cv.rect(local_rect(facing, 0.988, 1, f0, 1), SEAM)
 
-    # Each raised part with the screen side it stands on.
-    raised = [(local_rect(facing, 0, 1, 1 - BACK, 1), H_BACK, "back", OPP[facing])]
-    for state, side, (a0, a1) in ((ccw, CCW[facing], (0, None)), (cw, CW[facing], (None, 1))):
+    # Bands: (screen rect, the screen side that is its rolled outer edge, height).
+    bands = [(local_rect(facing, 0, 1, 1 - BACK, 1), OPP[facing], H_BACK)]
+    for state, side, lo in ((ccw, CCW[facing], True), (cw, CW[facing], False)):
         if state == "j":
             continue
         w = ARM if state == "a" else BACK
-        span = (0, w) if a0 == 0 else (1 - w, 1)
-        raised.append((local_rect(facing, span[0], span[1], 0, 1 - BACK),
-                       H_ARM if state == "a" else H_BACK, state, side))
-    # Painter's order: further up the screen first, then taller last.
-    raised.sort(key=lambda p: (p[0][3], p[1]))
+        span = (0, w) if lo else (1 - w, 1)
+        bands.append((local_rect(facing, span[0], span[1], f0, 1), side, H_ARM if state == "a" else H_BACK))
 
-    def south_wall(r, h):
-        """How deep the slab's own south wall is (0 where it runs on south)."""
-        return 0 if "south" in runs_on(r) else min(LIFT * h, (r[3] - r[1]) * 0.6)
+    def box(r):
+        return [px(r[0]), px(r[1]), px(r[2]) - 1, px(r[3]) - 1]
 
-    for r, h, kind, side in raised:
-        cv.slab(r, h, joined=runs_on(r))
-        # The face that looks in at the seat. A slab shows its south face as its
-        # wall already; a back or arm standing east or west of the seat also
-        # shows the face it turns towards the seat, as a darker strip down that
-        # side - so the backrest's inner face reads as one band round an L.
-        inner = OPP[side]
-        if inner in ("east", "west"):
-            x0, y0, x1, y1 = r
-            w = LIFT * h * 0.45
-            sx0, sx1 = (x1 - w, x1) if inner == "east" else (x0, x0 + w)
-            top = y0 if "north" in runs_on(r) else y0 + 0.012
-            cv.rect((sx0, top, sx1, y1 - south_wall(r, h)), WALL)
-            edge = (sx0, sx0 + 0.006) if inner == "east" else (sx1 - 0.006, sx1)
-            cv.rect((edge[0], top, edge[1], y1 - south_wall(r, h)), WALL_DARK)
-        if kind == "back":
-            # Tufting: a row of identical buttons along the backrest.
-            for a in (1 / 6, 1 / 2, 5 / 6):
-                bx0, by0, bx1, by1 = local_rect(facing, a - 0.02, a + 0.02,
-                                                1 - BACK * 0.5 - 0.02, 1 - BACK * 0.5 + 0.02)
-                cv.rect((bx0, by0 - 0.03, bx1, by1 - 0.03), SEAM)
+    union = Image.new("L", (C, C), 0)
+    shade = Image.new("L", (C, C), 0)      # 255 at a band's outer edge, 0 at its seat edge
+    for r, outer, h in bands:
+        ImageDraw.Draw(union).rectangle(box(r), fill=255)
+        x0, y0, x1, y1 = box(r)
+        g = Image.new("L", (C, C), 0)
+        gd = ImageDraw.Draw(g)
+        across = (x1 - x0) if outer in ("east", "west") else (y1 - y0)
+        top = 255 if h >= H_BACK else 215          # arms sit a step lower than the back
+        for k in range(across + 1):
+            v = int(top * (1 - k / max(1, across)) ** 1.4)
+            if outer == "north":
+                gd.line([(x0, y0 + k), (x1, y0 + k)], fill=v)
+            elif outer == "south":
+                gd.line([(x0, y1 - k), (x1, y1 - k)], fill=v)
+            elif outer == "west":
+                gd.line([(x0 + k, y0), (x0 + k, y1)], fill=v)
+            else:
+                gd.line([(x1 - k, y0), (x1 - k, y1)], fill=v)
+        shade = ImageChops.lighter(shade, g)
 
-    # Corner: where the back and the wrap-round back meet, the overlap is one
-    # top surface with a mitre - a diagonal from the inside corner out to the
-    # outer corner - instead of one back's face cutting across the other.
-    for state, (a0, a1) in ((ccw, (0, BACK)), (cw, (1 - BACK, 1))):
-        if state != "c":
+    # Soft shadow the bands cast onto the cushion, all round their seat side.
+    grow = union
+    for _ in range(int(0.05 * C) // 2):
+        grow = grow.filter(ImageFilter.MaxFilter(5))
+    cast = ImageChops.subtract(grow, union).filter(ImageFilter.GaussianBlur(int(0.02 * C)))
+    cast = ImageChops.multiply(cast, cv.img.getchannel("A")).point(lambda v: int(v * 0.42))
+    dark = Image.new("RGBA", (C, C), (0, 0, 0, 255))
+    shadow = Image.new("RGBA", (C, C), (0, 0, 0, 0))
+    shadow.paste(dark, (0, 0), cast)
+    cv.img.alpha_composite(shadow)
+
+    # The bands themselves, as one shape.
+    band_rgb = Image.composite(Image.new("RGBA", (C, C), BACK_OUT + (255,)),
+                               Image.new("RGBA", (C, C), BACK_IN + (255,)), shade)
+    cv.img.paste(band_rgb, (0, 0), union)
+    cv.mask.paste((255, 0, 0), (0, 0), union)
+
+    # Tufting: identical buttons down the middle of each back band, on the same
+    # thirds of a cell everywhere, so they line up across seats.
+    for r, outer, h in bands:
+        if h < H_BACK:
             continue
-        x0, y0, x1, y1 = local_rect(facing, a0, a1, 1 - BACK, 1)
-        if y1 >= 1 - 1e-6 and "south" in open_sides:
-            y1 -= min(LIFT * H_BACK, (y1 - y0) * 0.6)      # keep the outer face below
-        cv.rect((x0, y0, x1, y1), TOP)
-        cx, cy = 0.5, 0.5
-        corners = [(x0, y0), (x1, y0), (x0, y1), (x1, y1)]
-        inner_pt = min(corners, key=lambda p: (p[0] - cx) ** 2 + (p[1] - cy) ** 2)
-        outer_pt = max(corners, key=lambda p: (p[0] - cx) ** 2 + (p[1] - cy) ** 2)
-        cv.line([inner_pt, outer_pt], 0.012, SEAM)
+        x0, y0, x1, y1 = r
+        cx, cy = (x0 + x1) / 2, (y0 + y1) / 2
+        along = ([(x0 + t * (x1 - x0), cy) for t in (1 / 6, 1 / 2, 5 / 6)] if outer in ("north", "south")
+                 else [(cx, y0 + t * (y1 - y0)) for t in (1 / 6, 1 / 2, 5 / 6)])
+        for bx, by in along:
+            if any(o != outer and b[0] <= bx <= b[2] and b[1] <= by <= b[3]
+                   for b, o, _ in bands if _ >= H_BACK):
+                continue                          # not in the corner square twice
+            cv.ellipse((bx - 0.018, by - 0.018, bx + 0.018, by + 0.018), SEAM)
     cv.silhouette(open_sides)
-    cv.save(sect_path(facing, cw, ccw), sect_path(facing, cw, ccw, mask=True))
+    cv.save(sect_path(facing, cw, ccw, back=back), sect_path(facing, cw, ccw, mask=True, back=back))
 
 
 def rocker_path(kind, facing, mask=False):
@@ -415,7 +439,8 @@ def main():
     for facing in FACINGS:
         for cw in SIDE_STATES:
             for ccw in SIDE_STATES:
-                draw_sectional(facing, cw, ccw)
+                for back in (False, True):
+                    draw_sectional(facing, cw, ccw, back)
         # The def's own Graphic_Multi (blueprint, minified, placing ghost) is the
         # free-standing seat. Graphic_Multi masks append "m" with NO underscore.
         shutil.copy(sect_path(facing, "a", "a"), f"{SECT_DIR}/Slopkea_Sectional_{facing}.png")

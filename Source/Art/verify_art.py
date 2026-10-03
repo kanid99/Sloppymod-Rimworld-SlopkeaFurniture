@@ -77,6 +77,12 @@ for f in FACINGS:
             front_joined = "c" in (cw, ccw)
             state = {f: "j" if front_joined else "o", OPP[f]: "o", CW[f]: cw, CCW[f]: ccw}
             check_edges(p, {s for s, st in state.items() if st != "j"})
+            # Back to back (or against a wall): the back side is joined too.
+            pb = sect_path(f, cw, ccw, back=True)
+            check(os.path.exists(pb) and os.path.exists(sect_path(f, cw, ccw, True, True)), f"missing {pb}")
+            if os.path.exists(pb):
+                state[OPP[f]] = "j"
+                check_edges(pb, {s for s, st in state.items() if st != "j"})
             mask = Image.open(m).convert("RGB")
             red = sum(1 for r, g, b in mask.get_flattened_data() if r > 127) / (CELL * CELL)
             check(red > 0.8, f"{m}: only {red:.0%} tinted")

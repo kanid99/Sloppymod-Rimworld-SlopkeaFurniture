@@ -38,11 +38,23 @@ namespace SlopkeaFurniture
             return 'a';
         }
 
+        /// <summary>
+        /// The back is joined: a seat back to back with this one (facing the other
+        /// way), or a wall behind. The back then runs flush ("b"), so back-to-back
+        /// rows read as one island couch with a shared spine.
+        /// </summary>
+        public bool BackJoined()
+        {
+            IntVec3 behind = Rotation.Opposite.FacingCell;
+            Building_SlopkeaSectional b = Neighbors.Get<Building_SlopkeaSectional>(this, behind);
+            return (b != null && b.Rotation == Rotation.Opposite) || Neighbors.IsWall(this, behind);
+        }
+
         public string VariantPath()
         {
             char cw = SideState(Rotation.Rotated(RotationDirection.Clockwise));
             char ccw = SideState(Rotation.Rotated(RotationDirection.Counterclockwise));
-            return TexPrefix + FacingNames[Rotation.AsInt] + "_" + cw + ccw;
+            return TexPrefix + FacingNames[Rotation.AsInt] + "_" + cw + ccw + (BackJoined() ? "b" : "");
         }
 
         public override void Print(SectionLayer layer)
