@@ -11,7 +11,7 @@ namespace SlopkeaFurniture
     public class Building_SlopkeaRug : Building
     {
         // Must match Source/Art/draw_modular.py (rug_path, CORNERS).
-        private const string TexPrefix = "Things/Building/Furniture/Slopkea/Rug/Slopkea_Rug_";
+        protected virtual string TexPrefix => "Things/Building/Furniture/Slopkea/Rug/Slopkea_Rug_";
 
         public override void SpawnSetup(Map map, bool respawningAfterLoad)
         {

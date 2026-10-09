@@ -851,4 +851,84 @@
     </comps>
   </ThingDef>
 
+
+  <!-- SÄNKA conversation pit: a sunken floor and its built-in seats. -->
+  <ThingDef ParentName="SlopkeaFurnitureBase">
+    <defName>Slopkea_PitFloor</defName>
+    <label>SÄNKA conversation pit floor</label>
+    <description>The floor of a sunken conversation pit, carpeted in whatever fabric or leather it is built from. Drag out any shape: the pieces join into one pit, with the step-down walls and rim running round the outside. Line the inside with SÄNKA pit seats, and put a coffee table in the middle - furniture stands on it.</description>
+    <thingClass>SlopkeaFurniture.Building_SlopkeaPit</thingClass>
+    <graphicData>
+      <texPath>Things/Building/Furniture/Slopkea/Pit/Slopkea_Pit_0_0</texPath>
+      <graphicClass>Graphic_Single</graphicClass>
+      <shaderType>CutoutComplex</shaderType>
+      <drawSize>(1,1)</drawSize>
+    </graphicData>
+    <altitudeLayer>FloorEmplacement</altitudeLayer>
+    <drawStyleCategory>Slopkea_Area</drawStyleCategory>
+    <rotatable>false</rotatable>
+    <passability>Standable</passability>
+    <pathCost>0</pathCost>
+    <fillPercent>0</fillPercent>
+    <castEdgeShadows>false</castEdgeShadows>
+    <staticSunShadowHeight>0</staticSunShadowHeight>
+    <clearBuildingArea>false</clearBuildingArea>
+    <stuffCategories>
+      <li>Fabric</li>
+      <li>Leathery</li>
+    </stuffCategories>
+    <costStuffCount>15</costStuffCount>
+    <costList>
+      <Steel>2</Steel>
+    </costList>
+    <statBases>
+      <MaxHitPoints>40</MaxHitPoints>
+      <WorkToBuild>700</WorkToBuild>
+      <Mass>1</Mass>
+      <Flammability>1.0</Flammability>
+      <Beauty>3</Beauty>
+    </statBases>
+    <building>
+      <isEdifice>false</isEdifice>
+    </building>
+  </ThingDef>
+
+  <ThingDef ParentName="SlopkeaFurnitureBase">
+    <defName>Slopkea_PitSeat</defName>
+    <label>SÄNKA pit seat</label>
+    <description>Built-in banquette seating for a SÄNKA conversation pit. Drag a run of seats round the inside of the pit: they join into one long seat, turn corners, and lean their backs against the pit wall. Comfier than it has any right to be.</description>
+    <thingClass>SlopkeaFurniture.Building_SlopkeaPitSeat</thingClass>
+    <graphicData>
+      <texPath>Things/Building/Furniture/Slopkea/Pit/Slopkea_PitSeat</texPath>
+      <graphicClass>Graphic_Multi</graphicClass>
+      <shaderType>CutoutComplex</shaderType>
+      <drawSize>(1,1)</drawSize>
+    </graphicData>
+    <drawStyleCategory>Slopkea_Line</drawStyleCategory>
+    <rotatable>true</rotatable>
+    <defaultPlacingRot>South</defaultPlacingRot>
+    <passability>PassThroughOnly</passability>
+    <pathCost>30</pathCost>
+    <fillPercent>0.2</fillPercent>
+    <stuffCategories>
+      <li>Fabric</li>
+      <li>Leathery</li>
+      <li>Woody</li>
+      <li>Metallic</li>
+      <li>Stony</li>
+    </stuffCategories>
+    <costStuffCount>45</costStuffCount>
+    <statBases>
+      <MaxHitPoints>80</MaxHitPoints>
+      <WorkToBuild>1000</WorkToBuild>
+      <Mass>10</Mass>
+      <Flammability>1.0</Flammability>
+      <Beauty>3</Beauty>
+      <Comfort>0.8</Comfort>
+    </statBases>
+    <building>
+      <isSittable>true</isSittable>
+    </building>
+  </ThingDef>
+
 </Defs>

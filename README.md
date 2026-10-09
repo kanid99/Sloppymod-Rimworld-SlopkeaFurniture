@@ -15,6 +15,7 @@ Flat-pack, IKEA-inspired furniture for RimWorld 1.6. Some assembly required.
 - **GARDEROB wardrobe** – apparel storage, three stacks per unit; joins into a fitted run.
 - **VIKSKÄRM room divider** – drag a line of paper screen (it turns corners); blocks line of sight, passable.
 - **ODLÅDA planter box** – drag out a raised crop bed of any shape; grows ground crops at 110% fertility.
+- **SÄNKA conversation pit** – a pit floor you drag out in any shape (sunken carpet, step-down walls and rim round the outside; furniture stands on it) plus built-in pit seats that join like the sectional and lean against the pit wall.
 - **GLÖMSTRÄK table segment** – 1x1 dining-table panels placed with an area drag. Adjacent panels merge: rim only on exposed sides, legs only on outside corners. Any shape works and every cell is an eating surface.
 
 ## Layout

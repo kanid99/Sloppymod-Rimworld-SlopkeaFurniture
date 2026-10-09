@@ -184,6 +184,24 @@ shelving. The divider and planter take bit variants like the table.
   dragged shape, so the bed reads as one. Furrows sit on fixed fractions of the cell, so they
   line up across cells.
 
+## Conversation pit
+
+`draw_pit.py`. RimWorld can't lower the ground, so the pit is an illusion built from
+three cues:
+
+* **The floor** (`Slopkea_Pit_<sides>_<corners>`, rug-style joins): sunken carpet that
+  darkens towards its walls. Round the outside of the shape run the rim and the step-down
+  walls. The far wall shows its whole face, the side walls show a sliver, and the near wall
+  shows only its rim, as you'd see them looking down into a pit. The walls cast shadows onto
+  the carpet, and inside corners turn the far wall's face.
+* **The seats** (`Slopkea_PitSeat_...`) are the sectional drawn built in: no plinth or feet,
+  and the room's rim runs along their back and open ends, above the cushions.
+* **No outline round the outside.** The rim is the room floor, so the edge is where it
+  falls away: `drop_edge` draws a dark line on the rim's inner edge and a soft shadow below
+  it. An outline round the outside would fence the pit off like a raised object.
+
+The rim and walls are untinted plaster, and the carpet and seats take the stuff colour.
+
 ## The contract with the C#
 
 `verify_art.py` checks:

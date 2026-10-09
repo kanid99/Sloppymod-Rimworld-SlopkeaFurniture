@@ -92,7 +92,7 @@ def side_inset(state):
 BACK_OUT, BACK_IN = (248, 248, 248), (192, 192, 192)   # backrest: rolled outer edge to seat side
 
 
-def draw_sectional(facing, cw, ccw, back=False):
+def draw_sectional(facing, cw, ccw, back=False, pit=False):
     """One seat of the sectional, drawn so the backrest FLOWS.
 
     The back and arms are bands of constant width along the seat's outer edges,
@@ -126,8 +126,9 @@ def draw_sectional(facing, cw, ccw, back=False):
     # Plinth. It stops short of an open screen-bottom edge so the feet show.
     south_open = "south" in open_sides
     plinth = (0, 0, 1, 0.93 if south_open else 1.0)
-    cv.slab(plinth, H_PLINTH, face=WALL, wall=WALL_DARK, joined=runs_on(plinth))
-    if south_open:
+    if not pit:                              # a pit seat is built in: no plinth, no feet
+        cv.slab(plinth, H_PLINTH, face=WALL, wall=WALL_DARK, joined=runs_on(plinth))
+    if south_open and not pit:
         if "west" in open_sides:
             cv.rect((0.05, 0.90, 0.15, 1.0), FOOT, tint=False)
         if "east" in open_sides:
@@ -237,8 +238,34 @@ def draw_sectional(facing, cw, ccw, back=False):
         bx = x + (0.17 if x == 0 else -0.17)
         by = y + (0.17 if y == 0 else -0.17)
         cv.ellipse((bx - 0.018, by - 0.018, bx + 0.018, by + 0.018), SEAM)
-    cv.silhouette(open_sides)
-    cv.save(sect_path(facing, cw, ccw, back=back), sect_path(facing, cw, ccw, mask=True, back=back))
+    if pit:
+        # Built into a pit: the room's floor rim runs along the seat's outer edges
+        # (its back, and any open end), above the cushions - which is what makes
+        # the seat read as sitting below floor level.
+        from draw_pit import LIP, LIP_EDGE, LIPW
+        rims = []
+        if back == "":
+            rims.append(OPP[facing])
+        for state, side in ((cw, CW[facing]), (ccw, CCW[facing])):
+            if state in ("a", "c"):
+                rims.append(side)
+        for side in rims:
+            r = {"north": (0, 0, 1, LIPW), "south": (0, 1 - LIPW, 1, 1),
+                 "west": (0, 0, LIPW, 1), "east": (1 - LIPW, 0, 1, 1)}[side]
+            edge = {"north": (0, LIPW, 1, LIPW + 0.01), "south": (0, 1 - LIPW - 0.01, 1, 1 - LIPW),
+                    "west": (LIPW, 0, LIPW + 0.01, 1), "east": (1 - LIPW - 0.01, 0, 1 - LIPW, 1)}[side]
+            cv.rect(r, LIP, tint=False)
+        # The drop: a dark edge where the rim falls away, and the soft shadow it
+        # casts onto the seat below. The rim itself is the room floor, so it gets
+        # no outline - the outline would fence the pit off like a raised object.
+        from draw_pit import drop_edge
+        drop_edge(cv, rims)
+    cv.silhouette(open_sides - set(rims) if pit else open_sides)
+    if pit:
+        from draw_pit import pitseat_path
+        cv.save(pitseat_path(facing, cw, ccw, back=back), pitseat_path(facing, cw, ccw, mask=True, back=back))
+    else:
+        cv.save(sect_path(facing, cw, ccw, back=back), sect_path(facing, cw, ccw, mask=True, back=back))
 
 
 def rocker_path(kind, facing, mask=False):
@@ -495,6 +522,8 @@ def main():
     draw_kitchen_tall.draw_all()
     import draw_more
     draw_more.draw_all()
+    import draw_pit
+    draw_pit.draw_all()
     print(f"drew 16 table and 36 sectional variants, 2 rocking chairs, "
           f"16 desk, {rugs} rug and 16 shelf variants, 48 kitchen and 16 bookcase variants, "
           f"16 each of bench, wardrobe, divider and planter")

@@ -12,7 +12,7 @@ namespace SlopkeaFurniture
     public class Building_SlopkeaSectional : Building
     {
         // Must match Source/Art/draw_sprites.py (sect_path).
-        private const string TexPrefix = "Things/Building/Furniture/Slopkea/Sectional/Slopkea_Sectional_";
+        protected virtual string TexPrefix => "Things/Building/Furniture/Slopkea/Sectional/Slopkea_Sectional_";
         private static readonly string[] FacingNames = { "north", "east", "south", "west" };
 
         public override void SpawnSetup(Map map, bool respawningAfterLoad)

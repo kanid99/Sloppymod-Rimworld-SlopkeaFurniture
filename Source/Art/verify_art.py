@@ -153,7 +153,7 @@ kr = open("Source/SlopkeaFurniture/KitchenRun.cs").read()
 got = kr.split('Dir = "', 1)[1].split('"', 1)[0]
 check(dk.kitchen_path("Cabinet", "north", "o", "o").startswith("Textures/" + got), f"KitchenRun.cs: bad Dir {got}")
 bc = open("Source/SlopkeaFurniture/Building_SlopkeaBookcase.cs").read()
-got = bc.split('TexPrefix = "', 1)[1].split('"', 1)[0]
+got = re.search(r'TexPrefix (?:=|=>) "([^"]+)"', bc).group(1)
 # The bookcase builds <prefix><cw><ccw> and Graphic_Multi appends _<facing>.
 check(dk.book_path("north", "o", "j") == f"Textures/{got}oj_north.png", f"bookcase prefix {got} vs {dk.book_path('north', 'o', 'j')}")
 for p in (dk.BOOKEND_EAST, dk.BOOKEND_NORTH):
@@ -182,6 +182,22 @@ for name, sample in (("Bench", dmo.side_path("Bench", "north", "o", "o")),
                      ("Divider", dmo.divider_path(0)), ("Planter", dmo.planter_path(0))):
     got = mf.split(f'{name} = "', 1)[1].split('"', 1)[0]
     check(sample.startswith("Textures/" + got), f"MoreFurniture.cs {name}: {got} vs {sample}")
+
+# Conversation pit: the floor (rug-like variants) and the built-in seats.
+import draw_pit as dp
+cp = open("Source/SlopkeaFurniture/ConversationPit.cs").read()
+for name, sample in (("Building_SlopkeaPit ", dp.pit_path(0, 0)), ("Building_SlopkeaPitSeat ", dp.pitseat_path("north", "a", "a"))):
+    got = re.search(r'TexPrefix => "([^"]+)"', cp.split(name, 1)[1]).group(1)
+    check(sample.startswith("Textures/" + got), f"ConversationPit.cs {name.strip()}: {got} vs {sample}")
+for i, c in dm.rug_variants():
+    for q in (dp.pit_path(i, c), dp.pit_path(i, c, True)):
+        check(os.path.exists(q), f"missing {q}")
+for f in FACINGS:
+    for cw in SIDE_STATES:
+        for ccw in SIDE_STATES:
+            for kind in ("", "b", "p"):
+                for q in (dp.pitseat_path(f, cw, ccw, back=kind), dp.pitseat_path(f, cw, ccw, True, kind)):
+                    check(os.path.exists(q), f"missing {q}")
 
 # Joined edges carry on into the neighbour: the two edges that meet must match.
 def edge_mean(path, side):
@@ -215,7 +231,7 @@ for cs, sample in (("Building_SlopkeaTable.cs", table_path(0)),
                    ("Building_SlopkeaRug.cs", dm.rug_path(0, 0)),
                    ("Building_SlopkeaShelf.cs", dm.shelf_path("north", "o", "o"))):
     src = open("Source/SlopkeaFurniture/" + cs).read()
-    prefix = re.search(r'TexPrefix = "([^"]+)"', src).group(1)
+    prefix = re.search(r'TexPrefix (?:=|=>) "([^"]+)"', src).group(1)
     check(sample.startswith("Textures/" + prefix), f"{cs}: TexPrefix {prefix} does not match {sample}")
 src = open("Source/SlopkeaFurniture/Building_SlopkeaSectional.cs").read()
 check('"north", "east", "south", "west"' in src, "sectional facing names out of Rot4 order")
