@@ -39,22 +39,28 @@ namespace SlopkeaFurniture
         }
 
         /// <summary>
-        /// The back is joined: a seat back to back with this one (facing the other
-        /// way), or a wall behind. The back then runs flush ("b"), so back-to-back
-        /// rows read as one island couch with a shared spine.
+        /// What the back meets: "b" - a seat back to back with this one (facing
+        /// the other way) or a wall, so the back runs flush and back-to-back rows
+        /// read as one island with a shared spine; "p" - the side of a seat at
+        /// right angles, as when seats sit back-to-side round a square: then there
+        /// is no backrest, the seat is an all-round cushion and an upholstered
+        /// round post stands where they meet; "" - nothing, an ordinary back.
         /// </summary>
-        public bool BackJoined()
+        public string BackState()
         {
             IntVec3 behind = Rotation.Opposite.FacingCell;
+            if (Neighbors.IsWall(this, behind)) return "b";
             Building_SlopkeaSectional b = Neighbors.Get<Building_SlopkeaSectional>(this, behind);
-            return (b != null && b.Rotation == Rotation.Opposite) || Neighbors.IsWall(this, behind);
+            if (b == null) return "";
+            if (b.Rotation == Rotation.Opposite) return "b";
+            return b.Rotation != Rotation ? "p" : "";
         }
 
         public string VariantPath()
         {
             char cw = SideState(Rotation.Rotated(RotationDirection.Clockwise));
             char ccw = SideState(Rotation.Rotated(RotationDirection.Counterclockwise));
-            return TexPrefix + FacingNames[Rotation.AsInt] + "_" + cw + ccw + (BackJoined() ? "b" : "");
+            return TexPrefix + FacingNames[Rotation.AsInt] + "_" + cw + ccw + BackState();
         }
 
         public override void Print(SectionLayer layer)

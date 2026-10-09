@@ -43,9 +43,13 @@ def table_path(i):
 
 
 def sect_path(facing, cw, ccw, mask=False, back=False):
-    """`back`: the seat's back is joined - another seat back to back with it, or a
-    wall - so the back runs flush into it ("b")."""
-    return f"{SECT_DIR}/Slopkea_Sectional_{facing}_{cw}{ccw}{'b' if back else ''}{'_m' if mask else ''}.png"
+    """`back`: what the seat's back meets.
+    "b" (or True): another seat back to back with it, or a wall - the back runs flush.
+    "p": the side of a perpendicular seat - seats arranged back-to-side round a
+         square. Then there is no backrest at all: the seat is an all-round
+         cushion, and an upholstered round post stands where the seats meet."""
+    suffix = back if isinstance(back, str) else ("b" if back else "")
+    return f"{SECT_DIR}/Slopkea_Sectional_{facing}_{cw}{ccw}{suffix}{'_m' if mask else ''}.png"
 
 
 def draw_table(i):
@@ -99,12 +103,15 @@ def draw_sectional(facing, cw, ccw, back=False):
     and a ring of seats reads as one continuous back all the way round.
     """
     cv = Canvas()
+    if back is True:
+        back = "b"
+    post = back == "p"
     # A corner seat's front runs straight into the perpendicular seat in front of
     # it (which sees us as a joined side), so there is no silhouette there either.
     front_joined = "c" in (cw, ccw)
     # Back to back with another seat (or against a wall), the back runs flush:
     # two back bands meet as one spine, their rolled edges a ridge down it.
-    screen_state = {facing: "j" if front_joined else "open", OPP[facing]: "j" if back else "open",
+    screen_state = {facing: "j" if front_joined else "open", OPP[facing]: "j" if back in ("b", "p") else "open",
                     CW[facing]: cw, CCW[facing]: ccw}
     open_sides = {s for s, st in screen_state.items() if st != "j"}
     joined_sides = set(screen_state) - open_sides
@@ -127,18 +134,23 @@ def draw_sectional(facing, cw, ccw, back=False):
             cv.rect((0.85, 0.90, 0.95, 1.0), FOOT, tint=False)
 
     # The seat cushion fills the seat; the backs and arms are laid over its edges.
-    f0 = 0.0 if front_joined else 0.05
+    # Round a post the cushion runs to every edge alike, so all four sides of
+    # the island match.
+    f0 = 0.0 if (front_joined or post) else 0.05
     cushion = local_rect(facing, 0, 1, f0, 1)
     cv.slab(cushion, H_CUSHION, joined=runs_on(cushion))
     if ccw == "j":
         cv.rect(local_rect(facing, 0, 0.012, f0, 1), SEAM)
     if cw == "j":
         cv.rect(local_rect(facing, 0.988, 1, f0, 1), SEAM)
+    if post:
+        cv.rect(local_rect(facing, 0, 1, 0.988, 1), SEAM)    # meets the next seat's side
 
     # Bands: (screen rect, the screen side that is its rolled outer edge, height).
-    bands = [(local_rect(facing, 0, 1, 1 - BACK, 1), OPP[facing], H_BACK)]
+    # Round a post there are none: the seat is cushion all round.
+    bands = [] if post else [(local_rect(facing, 0, 1, 1 - BACK, 1), OPP[facing], H_BACK)]
     for state, side, lo in ((ccw, CCW[facing], True), (cw, CW[facing], False)):
-        if state == "j":
+        if state == "j" or post:
             continue
         w = ARM if state == "a" else BACK
         span = (0, w) if lo else (1 - w, 1)
@@ -167,6 +179,24 @@ def draw_sectional(facing, cw, ccw, back=False):
             else:
                 gd.line([(x1 - k, y0), (x1 - k, y1)], fill=v)
         shade = ImageChops.lighter(shade, g)
+
+    # The post: a round upholstered column centred on the corner where the seats
+    # meet - a quarter of it falls in each seat, so four seats make one round post.
+    post_at = None
+    if post:
+        jside = CW[facing] if cw == "j" else (CCW[facing] if ccw == "j" else None)
+        if jside:
+            pair = {OPP[facing], jside}
+            post_at = (1.0 if "east" in pair else 0.0, 1.0 if "south" in pair else 0.0)
+            R = 0.42
+            pxc, pyc, pr = px(post_at[0]), px(post_at[1]), px(R)
+            ImageDraw.Draw(union).ellipse([pxc - pr, pyc - pr, pxc + pr, pyc + pr], fill=255)
+            g = Image.new("L", (C, C), 0)
+            gd = ImageDraw.Draw(g)
+            for k in range(pr, 0, -2):           # lit on top, rolling off at the rim
+                v = int(255 * (1 - k / pr) ** 0.55)
+                gd.ellipse([pxc - k, pyc - k, pxc + k, pyc + k], fill=v)
+            shade = ImageChops.lighter(shade, g)
 
     # Soft shadow the bands cast onto the cushion, all round their seat side.
     grow = union
@@ -199,6 +229,14 @@ def draw_sectional(facing, cw, ccw, back=False):
                    for b, o, _ in bands if _ >= H_BACK):
                 continue                          # not in the corner square twice
             cv.ellipse((bx - 0.018, by - 0.018, bx + 0.018, by + 0.018), SEAM)
+    if post_at:
+        # Tufting: one button at the post's crown (a quarter in each seat) and a
+        # ring of four - one per seat, pointing into it.
+        x, y = post_at
+        cv.ellipse((x - 0.03, y - 0.03, x + 0.03, y + 0.03), SEAM)
+        bx = x + (0.17 if x == 0 else -0.17)
+        by = y + (0.17 if y == 0 else -0.17)
+        cv.ellipse((bx - 0.018, by - 0.018, bx + 0.018, by + 0.018), SEAM)
     cv.silhouette(open_sides)
     cv.save(sect_path(facing, cw, ccw, back=back), sect_path(facing, cw, ccw, mask=True, back=back))
 
@@ -439,7 +477,7 @@ def main():
     for facing in FACINGS:
         for cw in SIDE_STATES:
             for ccw in SIDE_STATES:
-                for back in (False, True):
+                for back in ("", "b", "p"):
                     draw_sectional(facing, cw, ccw, back)
         # The def's own Graphic_Multi (blueprint, minified, placing ghost) is the
         # free-standing seat. Graphic_Multi masks append "m" with NO underscore.

@@ -18,10 +18,18 @@ def table_index(scene, cell):
 
 
 def sectional_back(scene, cell):
-    """Mirror of Building_SlopkeaSectional.BackJoined: a seat behind facing the other way."""
+    """Mirror of Building_SlopkeaSectional.BackState: "b" for a seat behind facing
+    the other way (or a wall), "p" for a perpendicular seat behind (a post), else ""."""
     facing = scene[cell][1]
     n = scene.get(step(cell, OPP[facing]))
-    return bool(n and n[0] == "sect" and n[1] == OPP[facing]) or scene.get(step(cell, OPP[facing]), ("",))[0] == "wall"
+    if n and n[0] == "wall":
+        return "b"
+    if n and n[0] == "sect":
+        if n[1] == OPP[facing]:
+            return "b"
+        if n[1] != facing:
+            return "p"
+    return ""
 
 
 def sectional_states(scene, cell):
