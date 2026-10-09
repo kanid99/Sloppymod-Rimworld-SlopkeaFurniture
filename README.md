@@ -16,6 +16,8 @@ Flat-pack, IKEA-inspired furniture for RimWorld 1.6. Some assembly required.
 - **VIKSKÄRM room divider** – drag a line of paper screen (it turns corners); blocks line of sight, passable.
 - **ODLÅDA planter box** – drag out a raised crop bed of any shape; grows ground crops at 110% fertility.
 - **SÄNKA conversation pit** – a pit floor you drag out in any shape (sunken carpet, step-down walls and rim round the outside; furniture stands on it) plus built-in pit seats that join like the sectional and lean against the pit wall.
+- **BOLLSKÅL papasan chair** – a rattan bowl on a drum base with a big round cushion (fabric or leather).
+- **Hanging swings** – GUNGBÄDD daybed (wood, on rope), KORGSVING rattan basket (on chains) and PLATTSVING platform (on rope). Two seats wide, sway while occupied, and can only be built under a roof.
 - **GLÖMSTRÄK table segment** – 1x1 dining-table panels placed with an area drag. Adjacent panels merge: rim only on exposed sides, legs only on outside corners. Any shape works and every cell is an eating surface.
 
 ## Layout

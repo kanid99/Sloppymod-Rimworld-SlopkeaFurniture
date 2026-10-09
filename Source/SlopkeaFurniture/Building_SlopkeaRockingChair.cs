@@ -14,17 +14,26 @@ namespace SlopkeaFurniture
     /// </summary>
     public class Building_SlopkeaRockingChair : Building
     {
-        private const float RockDistance = 0.035f;   // cells, at the end of each swing
         private const float RockAngle = 4f;          // degrees, side views
-        private const float RockSpeed = 0.06f;       // radians per tick
+
+        /// <summary>How far it moves at the end of each swing, in cells.</summary>
+        protected virtual float RockDistance => 0.035f;
+
+        /// <summary>Radians per tick: how quickly it goes back and forth.</summary>
+        protected virtual float RockSpeed => 0.06f;
 
         /// <summary>False for a glider: it swings flat on its links, so it only slides.</summary>
         protected virtual bool Tilts => true;
 
+        // Any cell: a swing is two seats wide.
         private bool Occupied()
         {
-            Pawn p = Position.GetFirstPawn(Map);
-            return p != null && !p.pather.Moving && p.GetPosture() == PawnPosture.Standing;
+            foreach (IntVec3 c in this.OccupiedRect())
+            {
+                Pawn p = c.GetFirstPawn(Map);
+                if (p != null && !p.pather.Moving && p.GetPosture() == PawnPosture.Standing) return true;
+            }
+            return false;
         }
 
         protected override void DrawAt(Vector3 drawLoc, bool flip = false)

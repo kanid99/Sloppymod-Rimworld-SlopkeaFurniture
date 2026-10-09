@@ -199,6 +199,18 @@ for f in FACINGS:
                 for q in (dp.pitseat_path(f, cw, ccw, back=kind), dp.pitseat_path(f, cw, ccw, True, kind)):
                     check(os.path.exists(q), f"missing {q}")
 
+# Papasan and swings: free-standing views, all four facings, with masks; the
+# swings are 2x1 (east/west views 1x2).
+import draw_swing as dsw
+for kind in ("Papasan",) + dsw.SWINGS:
+    for f in FACINGS:
+        for q in (dsw.path(kind, f), dsw.path(kind, f, True)):
+            check(os.path.exists(q), f"missing {q}")
+        if kind != "Papasan" and os.path.exists(dsw.path(kind, f)):
+            want = (2 * CELL, CELL) if f in ("north", "south") else (CELL, 2 * CELL)
+            got = Image.open(dsw.path(kind, f)).size
+            check(got == want, f"{dsw.path(kind, f)}: {got}, want {want}")
+
 # Joined edges carry on into the neighbour: the two edges that meet must match.
 def edge_mean(path, side):
     px = edge_pixels(Image.open(path).convert("RGBA"), side, 1)

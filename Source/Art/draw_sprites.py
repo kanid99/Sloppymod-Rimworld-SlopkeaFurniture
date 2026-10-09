@@ -524,6 +524,8 @@ def main():
     draw_more.draw_all()
     import draw_pit
     draw_pit.draw_all()
+    import draw_swing
+    draw_swing.draw_all()
     print(f"drew 16 table and 36 sectional variants, 2 rocking chairs, "
           f"16 desk, {rugs} rug and 16 shelf variants, 48 kitchen and 16 bookcase variants, "
           f"16 each of bench, wardrobe, divider and planter")

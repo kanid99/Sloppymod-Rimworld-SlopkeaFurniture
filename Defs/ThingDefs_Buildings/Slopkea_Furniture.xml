@@ -931,4 +931,145 @@
     </building>
   </ThingDef>
 
+  <!-- BOLLSKÅL papasan chair: a rattan bowl and a big round cushion. -->
+  <ThingDef ParentName="SlopkeaFurnitureBase">
+    <defName>Slopkea_Papasan</defName>
+    <label>BOLLSKÅL papasan chair</label>
+    <description>A deep rattan bowl on a drum base, filled with a huge round cushion of whatever fabric or leather it's built from. Very easy to sit in; much harder to get out of.</description>
+    <thingClass>Building</thingClass>
+    <graphicData>
+      <texPath>Things/Building/Furniture/Slopkea/Papasan/Slopkea_Papasan</texPath>
+      <graphicClass>Graphic_Multi</graphicClass>
+      <shaderType>CutoutComplex</shaderType>
+      <drawSize>(1,1)</drawSize>
+    </graphicData>
+    <rotatable>true</rotatable>
+    <defaultPlacingRot>South</defaultPlacingRot>
+    <passability>PassThroughOnly</passability>
+    <pathCost>30</pathCost>
+    <fillPercent>0.4</fillPercent>
+    <stuffCategories>
+      <li>Fabric</li>
+      <li>Leathery</li>
+    </stuffCategories>
+    <costStuffCount>40</costStuffCount>
+    <costList>
+      <WoodLog>25</WoodLog>
+    </costList>
+    <statBases>
+      <MaxHitPoints>70</MaxHitPoints>
+      <WorkToBuild>1200</WorkToBuild>
+      <Mass>8</Mass>
+      <Flammability>1.0</Flammability>
+      <Beauty>3</Beauty>
+      <Comfort>0.85</Comfort>
+    </statBases>
+    <building>
+      <isSittable>true</isSittable>
+    </building>
+  </ThingDef>
+
+  <!-- Hanging porch swings: two seats wide, swing while occupied, need a roof. -->
+  <ThingDef Name="SlopkeaSwingBase" ParentName="SlopkeaFurnitureBase" Abstract="True">
+    <thingClass>SlopkeaFurniture.Building_SlopkeaSwing</thingClass>
+    <!-- Real time, not map mesh: the swing moves. -->
+    <drawerType>RealtimeOnly</drawerType>
+    <size>(2,1)</size>
+    <rotatable>true</rotatable>
+    <defaultPlacingRot>South</defaultPlacingRot>
+    <passability>PassThroughOnly</passability>
+    <pathCost>30</pathCost>
+    <fillPercent>0.4</fillPercent>
+    <placeWorkers>
+      <li>SlopkeaFurniture.PlaceWorker_SlopkeaNeedsRoof</li>
+    </placeWorkers>
+    <building>
+      <isSittable>true</isSittable>
+    </building>
+  </ThingDef>
+
+  <ThingDef ParentName="SlopkeaSwingBase">
+    <defName>Slopkea_SwingDaybed</defName>
+    <label>GUNGBÄDD daybed swing</label>
+    <description>A deep wooden porch swing with a slatted back, scroll arms and a thick cream cushion piled with pillows, hung from the ceiling on rope. Seats two, sways gently while anyone's in it. Needs a roof to hang from.</description>
+    <graphicData>
+      <texPath>Things/Building/Furniture/Slopkea/Swing/Slopkea_SwingDaybed</texPath>
+      <graphicClass>Graphic_Multi</graphicClass>
+      <shaderType>CutoutComplex</shaderType>
+      <drawSize>(2,1)</drawSize>
+    </graphicData>
+    <stuffCategories>
+      <li>Woody</li>
+    </stuffCategories>
+    <costStuffCount>60</costStuffCount>
+    <costList>
+      <Cloth>20</Cloth>
+    </costList>
+    <statBases>
+      <MaxHitPoints>90</MaxHitPoints>
+      <WorkToBuild>1600</WorkToBuild>
+      <Mass>18</Mass>
+      <Flammability>1.0</Flammability>
+      <Beauty>4</Beauty>
+      <Comfort>0.85</Comfort>
+    </statBases>
+  </ThingDef>
+
+  <ThingDef ParentName="SlopkeaSwingBase">
+    <defName>Slopkea_SwingRattan</defName>
+    <label>KORGSVING rattan swing</label>
+    <description>A curved rattan basket swing on steel chains, filled with a deep tufted cushion of whatever fabric or leather it's built from. Seats two, sways gently while anyone's in it. Needs a roof to hang from.</description>
+    <graphicData>
+      <texPath>Things/Building/Furniture/Slopkea/Swing/Slopkea_SwingRattan</texPath>
+      <graphicClass>Graphic_Multi</graphicClass>
+      <shaderType>CutoutComplex</shaderType>
+      <drawSize>(2,1)</drawSize>
+    </graphicData>
+    <stuffCategories>
+      <li>Fabric</li>
+      <li>Leathery</li>
+    </stuffCategories>
+    <costStuffCount>45</costStuffCount>
+    <costList>
+      <WoodLog>30</WoodLog>
+      <Steel>15</Steel>
+    </costList>
+    <statBases>
+      <MaxHitPoints>90</MaxHitPoints>
+      <WorkToBuild>1600</WorkToBuild>
+      <Mass>18</Mass>
+      <Flammability>1.0</Flammability>
+      <Beauty>4</Beauty>
+      <Comfort>0.9</Comfort>
+    </statBases>
+  </ThingDef>
+
+  <ThingDef ParentName="SlopkeaSwingBase">
+    <defName>Slopkea_SwingPlatform</defName>
+    <label>PLATTSVING platform swing</label>
+    <description>A flat white-painted platform swing on rope, with a long cushion of whatever fabric or leather it's built from and two pillows. Seats two, sways gently while anyone's in it. Needs a roof to hang from.</description>
+    <graphicData>
+      <texPath>Things/Building/Furniture/Slopkea/Swing/Slopkea_SwingPlatform</texPath>
+      <graphicClass>Graphic_Multi</graphicClass>
+      <shaderType>CutoutComplex</shaderType>
+      <drawSize>(2,1)</drawSize>
+    </graphicData>
+    <stuffCategories>
+      <li>Fabric</li>
+      <li>Leathery</li>
+    </stuffCategories>
+    <costStuffCount>40</costStuffCount>
+    <costList>
+      <WoodLog>30</WoodLog>
+    </costList>
+    <statBases>
+      <MaxHitPoints>90</MaxHitPoints>
+      <WorkToBuild>1600</WorkToBuild>
+      <Mass>18</Mass>
+      <Flammability>1.0</Flammability>
+      <Beauty>3</Beauty>
+      <Comfort>0.8</Comfort>
+    </statBases>
+  </ThingDef>
+
 </Defs>
