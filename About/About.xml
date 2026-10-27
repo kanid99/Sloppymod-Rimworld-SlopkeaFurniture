@@ -3,11 +3,12 @@
   <name>Slopkea Furniture</name>
   <author>kanid99</author>
   <packageId>kanid99.slopkeafurniture</packageId>
-  <modVersion>0.9.23</modVersion>
+  <modVersion>0.9.24</modVersion>
   <supportedVersions>
     <li>1.6</li>
+    <li>1.7</li>
   </supportedVersions>
-  <description>Build 0.9.23
+  <description>Build 0.9.24
 
 Flat-pack furniture for the discerning rimworlder. Some assembly required.
 

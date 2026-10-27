@@ -1,6 +1,6 @@
 # Slopkea Furniture
 
-Flat-pack, IKEA-inspired furniture for RimWorld 1.6. Some assembly required.
+Flat-pack, IKEA-inspired furniture for RimWorld 1.6 and 1.7. Some assembly required.
 
 ## Furniture
 - **Everything is stuffable.** All Slopkea pieces inherit `SlopkeaFurnitureBase` and take stuff.
