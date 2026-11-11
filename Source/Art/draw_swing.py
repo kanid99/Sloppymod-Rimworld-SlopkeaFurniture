@@ -174,15 +174,29 @@ def hang(cv, xs, y_top, y_bottom, kind):
 
 
 def draw_swing(kind, facing):
-    """A two-seat hanging swing, 2x1. North/south views are 2 cells wide, east and
-    west 2 cells tall. Each style:
-      Daybed   - slatted wooden back and scroll arms (stuff) on ropes, cream cushion.
-      Rattan   - a curved woven shell (fixed) on chains, tufted cushion (stuff).
+    """A two-seat hanging swing, 2x1, seen from above in every facing - the same
+    plan laid out four ways, so it does not change projection when it is turned.
+    North/south views are 2 cells wide, east and west 2 cells tall. Each style:
+      Daybed   - a wooden back and arms (stuff) on ropes, cream cushion.
+      Rattan   - a woven shell (fixed) on chains, cushion (stuff).
       Platform - a flat white-painted platform on ropes, long cushion (stuff).
+
+    The plan is described once, in the swing's own frame: `a` along its length
+    (0..2) and `c` across it from the back (0) to the front (1). `R` places a
+    rect for the facing; pixels are never rotated, so the light stays at the top.
     """
     wide = facing in ("north", "south")
     cv = Big(2, 1) if wide else Big(1, 2)
-    L = 2.0                                           # the swing's length, in cells
+    flip = facing in ("north", "west")               # the back is at the bottom / right
+
+    def R(a0, c0, a1, c1):
+        if flip:
+            c0, c1 = 1 - c1, 1 - c0
+        return (a0, c0, a1, c1) if wide else (c0, a0, c1, a1)
+
+    def lit_edge(r, depth=0.045):                    # the screen-top edge of a part
+        return (r[0], r[1], r[2], r[1] + depth)
+
     # Frame colours: stuff-tinted for the daybed, fixed otherwise.
     if kind == "Daybed":
         F, F_LIT, F_DARK, ft = TOP, TOP_LIT, WALL_DARK, True
@@ -197,89 +211,38 @@ def draw_swing(kind, facing):
         CU, CU_LIT, CU_DARK, ct = TOP, TOP_LIT, WALL, True
         rope = "rope"
 
-    if wide:
-        front = facing == "south"
-        # Seat platform and cushion, a back along the far side, arms at the ends.
-        if kind == "Rattan":
-            shell = [(0.08, 0.30), (0.30, 0.18), (1.70, 0.18), (1.92, 0.30), (1.86, 0.74), (1.50, 0.86),
-                     (0.50, 0.86), (0.14, 0.74)]
-            cv.poly(shell, F, ft)
-            cv.line(shell + [shell[0]], 0.03, F_DARK, ft)
-            for k in range(1, 9):                                     # the woven bands
-                x = 0.1 + k * 0.2
-                cv.line([(x, 0.22), (x, 0.82)], 0.012, F_DARK, ft)
-        else:
-            cv.rect((0.06, 0.62, 1.94, 0.80), F_DARK, ft)            # platform edge
-            cv.rect((0.06, 0.58, 1.94, 0.64), F, ft)
-        if front:
-            if kind == "Daybed":
-                cv.rect((0.10, 0.08, 1.90, 0.40), F, ft)              # slatted back
-                for k in range(1, 12):
-                    x = 0.10 + k * 0.15
-                    cv.rect((x - 0.012, 0.12, x + 0.012, 0.38), F_DARK, ft)
-                cv.line([(0.10, 0.09), (1.90, 0.09)], 0.035, F_LIT, ft)
-            elif kind == "Rattan":
-                cv.ellipse((0.20, 0.12, 1.80, 0.46), CU_DARK, ct)     # tufted back cushion
-                cv.ellipse((0.22, 0.13, 1.78, 0.42), CU, ct)
-                for x in (0.6, 1.0, 1.4):
-                    cv.ellipse((x - 0.02, 0.26, x + 0.02, 0.30), SEAM, ct)
-            # Fill behind the cushion and pillows, so no gap is left for the
-            # outline to fence off.
-            cv.rect((0.10, 0.28, 1.90, 0.62), F_DARK if kind == "Daybed" else CU_DARK,
-                    ft if kind == "Daybed" else ct)
-            # The seat cushion, and pillows leaning on the back.
-            cv.rect((0.16, 0.42, 1.84, 0.62), CU, ct)
-            cv.rect((0.16, 0.42, 1.84, 0.46), CU_LIT, ct)
-            cv.rect((0.16, 0.58, 1.84, 0.62), CU_DARK, ct)
-            for x0 in (0.26, 1.42):
-                cv.rect((x0, 0.30, x0 + 0.32, 0.48), CU_LIT if kind != "Platform" else WALL, ct)
-                cv.rect((x0, 0.44, x0 + 0.32, 0.48), CU_DARK, ct)
-            if kind == "Daybed":
-                for x in (0.10, 1.90):                                 # scroll arms
-                    cv.line([(x, 0.22), (x, 0.60)], 0.06, F, ft)
-                    cv.ellipse((x - 0.045, 0.18, x + 0.045, 0.27), F_LIT, ft)
-        else:
-            # From behind: the back of the back, the cushion just showing over it.
-            cv.rect((0.16, 0.24, 1.84, 0.40), CU, ct)
-            if kind == "Daybed":
-                cv.rect((0.10, 0.36, 1.90, 0.62), F, ft)
-                for k in range(1, 12):
-                    x = 0.10 + k * 0.15
-                    cv.rect((x - 0.012, 0.38, x + 0.012, 0.60), F_DARK, ft)
-            elif kind == "Platform":
-                cv.rect((0.10, 0.40, 1.90, 0.58), F, ft)
-        hangs = [((0.12, 1.88), 0.0, 0.62)]
-    else:
-        # Side views: the swing seen end-on along its length, front to the right
-        # for east. Back on the far (left) side, seat in the middle.
-        right = facing == "east"
-        bx = (0.08, 0.30) if right else (0.70, 0.92)                  # the back, edge-on
-        sx = (0.26, 0.86) if right else (0.14, 0.74)                  # the seat
-        if kind == "Rattan":
-            cv.ellipse((0.06, 0.06, 0.94, 1.94), F, ft)
-            cv.d.ellipse([px(0.06), px(0.06), px(0.94), px(1.94)], outline=F_DARK, width=px(0.03))
-            for k in range(1, 9):
-                y = 0.1 + k * 0.2
-                cv.line([(0.12, y), (0.88, y)], 0.012, F_DARK, ft)
-        cv.rect((sx[0], 0.10, sx[1], 1.90), CU, ct)                    # the seat cushion
-        cv.rect((sx[0], 0.10, sx[1], 0.16), CU_LIT, ct)
-        if kind != "Platform":
-            cv.rect((bx[0], 0.10, bx[1], 1.90), F if kind == "Daybed" else CU_DARK, ft if kind == "Daybed" else ct)
-        if kind == "Daybed":
-            for y0 in (0.06, 1.80):                                    # arms
-                cv.rect((0.08, y0, 0.92, y0 + 0.14), F, ft)
-                cv.rect((0.08, y0, 0.92, y0 + 0.03), F_LIT, ft)
-        if kind == "Platform":
-            cv.rect((0.10, 0.06, 0.90, 0.14), F_DARK, ft)
-            cv.rect((0.10, 1.86, 0.90, 1.94), F_DARK, ft)
-        # Ropes at each end rise straight up: from above, the far end's rope runs
-        # a short way up-screen; the near end shows its knot.
-        mid = (sx[0] + sx[1]) / 2
-        hangs = [((mid,), 0.0, 0.16), ((mid,), 1.80, 1.84)]
+    # The base everything sits on.
+    cv.rect(R(0.06, 0.08, 1.94, 0.92), F_DARK, ft)                 # the platform, or the woven shell
+    cv.rect(R(0.08, 0.10, 1.92, 0.90), F, ft)
+    if kind == "Rattan":
+        for k in range(1, 9):                                       # the woven bands
+            a_ = 0.1 + k * 0.2
+            cv.rect(R(a_ - 0.006, 0.10, a_ + 0.006, 0.90), F_DARK, ft)
+    # Seat cushion, with the back along the far side.
+    seat = R(0.12, 0.24, 1.88, 0.86)
+    cv.rect(seat, CU, ct)
+    cv.rect(lit_edge(seat), CU_LIT, ct)
+    cv.rect((seat[0], seat[3] - 0.04, seat[2], seat[3]), CU_DARK, ct)
+    if kind != "Platform":
+        back = R(0.10, 0.08, 1.90, 0.28)
+        cv.rect(back, F if kind == "Daybed" else CU_DARK, ft if kind == "Daybed" else ct)
+        cv.rect(lit_edge(back, 0.03), F_LIT if kind == "Daybed" else CU, ft if kind == "Daybed" else ct)
+    # Two pillows leaning on the back.
+    for a0 in (0.30, 1.38):
+        pil = R(a0, 0.26, a0 + 0.32, 0.46)
+        cv.rect(pil, CU_LIT, ct)
+        cv.rect((pil[0], pil[3] - 0.035, pil[2], pil[3]), CU_DARK, ct)
+    if kind == "Daybed":
+        for a0 in (0.06, 1.80):                                     # arms
+            arm = R(a0, 0.08, a0 + 0.14, 0.92)
+            cv.rect(arm, F, ft)
+            cv.rect(lit_edge(arm, 0.03), F_LIT, ft)
     cv.finish(ring=6 * 4)
-    # Hung after the outline, so the ropes sit in front with their own edge.
-    for xs, y0, y1 in hangs:
-        hang(cv, xs, y0, y1, rope)
+    # Hung after the outline, so the ropes sit in front with their own edge. From
+    # above each rope is its knot on the end rail and a short run up the screen.
+    for a_ in (0.13, 1.87):
+        x, y = (a_, 0.5) if wide else (0.5, a_)
+        hang(cv, (x,), y - 0.11, y, rope)
     cv.save(path(kind, facing), path(kind, facing, True))
 
 

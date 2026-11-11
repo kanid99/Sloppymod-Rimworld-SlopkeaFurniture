@@ -120,7 +120,7 @@ class Canvas:
         if "north" not in joined:
             self.rect((x0, y0, x1, y0 + 0.012), lit, tint)
 
-    def _padded_alpha(self, open_sides, pad):
+    def _padded_alpha(self, open_sides, pad, context=None, empty_diagonals=()):
         """The silhouette, padded by `pad` px: opaque past joined sides (they carry
         on into the neighbour), transparent past open ones. Every silhouette effect
         works on this, so none of them ever marks a seam between two pieces."""
@@ -147,29 +147,58 @@ class Canvas:
                            ("south", "east", [pad + C, pad + C, full, full])):
             if v not in open_sides and hz not in open_sides:
                 d.rectangle(box, fill=255)
+        # Real neighbours. Where the caller knows what stands beyond a joined side
+        # it passes that piece's own finished silhouette, and the pad is cut from
+        # it, not guessed from this cell's edge - so the ring here is measured
+        # from the same boundary the neighbour's ring was, and the two line up.
+        for side, nb in (context or {}).items():
+            strip = {"east": (0, 0, pad, C), "west": (C - pad, 0, C, C),
+                     "south": (0, 0, C, pad), "north": (0, C - pad, C, C)}[side]
+            at = {"east": (pad + C, pad), "west": (0, pad), "south": (pad, pad + C), "north": (pad, 0)}[side]
+            P.paste(nb.crop(strip), at)
+        # The cell diagonally inside an L is empty, even though both sides join.
+        for ns, ew in empty_diagonals:
+            xs = (pad + C, full) if ew == "east" else (0, pad - 1)
+            ys = (pad + C, full) if ns == "south" else (0, pad - 1)
+            d.rectangle([xs[0], ys[0], xs[1], ys[1]], fill=0)
         return a, P
 
-    def silhouette(self, open_sides, ring=RING):
+    def silhouette(self, open_sides, ring=RING, context=None, empty_diagonals=(), corner=0.035):
         """Finish a sprite against its silhouette, in the order VFE's furniture
         reads: rounded outer corners, soft light on the upper-left edges and shade
         on the lower-right, then the black ring. All three follow OPEN edges and
         gaps only; joined sides are padded as carrying on, so seams stay clean.
+
+        An inside corner of an L is the one place a joined side is not simply
+        "more of the same": pass `context` {side: the neighbour's finished alpha}
+        and `empty_diagonals` {(ns side, ew side)}. The ring and edge light are
+        then measured from the true assembled outline, so they turn the corner
+        inside this cell and run straight into the neighbours' own. The corner
+        is left unrounded here: its shape is the neighbours', already rounded.
+
+        `corner` is the rounding radius of the outer corners, in cells. Worktops
+        and cabinets pass a small one: vanilla's benches are nearly square.
         """
         pad = int(0.2 * C)
-        a, P = self._padded_alpha(open_sides, pad)
+        a, P = self._padded_alpha(open_sides, pad, context, empty_diagonals)
         crop = lambda im: im.crop((pad, pad, pad + C, pad + C))
 
         # 1. Round the outer corners: blur and re-threshold the padded silhouette.
         # Only ever removes pixels, and a joined side is flat, so it stays square.
-        rounded = crop(P.filter(ImageFilter.GaussianBlur(int(0.035 * C))).point(
+        rounded = crop(P.filter(ImageFilter.GaussianBlur(int(corner * C))).point(
             lambda v: 255 if v > 150 else 0))
         cut = ImageChops.subtract(a, rounded)
+        for ns, ew in empty_diagonals:      # never re-round an inside corner
+            k = int(0.25 * C)
+            x0 = C - k if ew == "east" else 0
+            y0 = C - k if ns == "south" else 0
+            ImageDraw.Draw(cut).rectangle([x0, y0, x0 + k - 1, y0 + k - 1], fill=0)
         if cut.getbbox():
             clear = Image.new("RGBA", (C, C), (0, 0, 0, 0))
             self.img.paste(clear, (0, 0), cut)
             self.mask.paste((0, 0, 0), (0, 0), cut)
-            a = ImageChops.multiply(a, rounded)
-            _, P = self._padded_alpha(open_sides, pad)
+            a = ImageChops.subtract(a, cut)
+            _, P = self._padded_alpha(open_sides, pad, context, empty_diagonals)
 
         # 2. Edge light: inside the silhouette, near an edge that faces up-left,
         # lift towards white; near one facing down-right, sink towards black.

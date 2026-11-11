@@ -248,6 +248,39 @@ for cs, sample in (("Building_SlopkeaTable.cs", table_path(0)),
 src = open("Source/SlopkeaFurniture/Building_SlopkeaSectional.cs").read()
 check('"north", "east", "south", "west"' in src, "sectional facing names out of Rot4 order")
 
+# Inside corners of an L: where the run's front and the perpendicular seat's front
+# meet, the outline must turn the corner - no tinted pixel may touch the floor.
+# Each tile passes the per-edge checks on its own, so this one is on the assembly.
+def inside_corner_gaps(tiles, cx, cz):
+    im = Image.new("RGBA", (3 * CELL, 3 * CELL), (0, 0, 0, 0))
+    for (x, z), path in tiles.items():
+        im.alpha_composite(Image.open(path).convert("RGBA"), (x * CELL, (2 - z) * CELL))
+    px = im.load()
+    ox, oy = (CELL if cx == 0 else 2 * CELL), (CELL if cz == 2 else 2 * CELL)
+    solid = lambda x, y: px[x, y][3] > 127
+    gaps = 0
+    for y in range(oy - 28, oy + 28):
+        for x in range(ox - 28, ox + 28):
+            if solid(x, y) and max(px[x, y][:3]) >= 60 and not (
+                    solid(x - 1, y) and solid(x + 1, y) and solid(x, y - 1) and solid(x, y + 1)):
+                gaps += 1
+    return gaps
+
+
+import compose
+for cx, cz in ((0, 2), (2, 2), (0, 0), (2, 0)):
+    hface, vface = ("south" if cz == 2 else "north"), ("east" if cx == 0 else "west")
+    for cface in (hface, vface):
+        scene = {(x, cz): ("sect", hface) for x in range(3)}
+        scene.update({(cx, z): ("sect", vface) for z in range(3)})
+        scene[(cx, cz)] = ("sect", cface)
+        for name, fn in (("sectional", sect_path), ("pit seat", dp.pitseat_path)):
+            tiles = {c: fn(t[1], *compose.sectional_states(scene, c), back=compose.sectional_back(scene, c))
+                     for c, t in scene.items()}
+            g = inside_corner_gaps(tiles, cx, cz)
+            check(g == 0, f"{name} L, corner seat facing {cface} at {(cx, cz)}: "
+                          f"outline does not turn the inside corner ({g}px unoutlined)")
+
 if errors:
     print("\n".join(errors))
     sys.exit(1)

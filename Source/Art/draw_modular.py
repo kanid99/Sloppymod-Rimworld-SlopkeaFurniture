@@ -132,53 +132,33 @@ CUBBY_TOP = (100, 100, 100)    # the shadow under the shelf above
 
 
 def draw_shelf(facing, cw, ccw):
-    """KALLAX-style cube unit, one column of two cubes per cell, drawn as a view.
+    """KALLAX-style cube unit, seen from above like vanilla's shelves: the top
+    covers the cell, and the open cubes show on the strip along the screen-bottom
+    edge when it faces south, edge-on down the front in the side views.
 
     Joins only to a neighbour facing the same way, on its cw/ccw sides; a joined
-    side has no outer wall, so a run reads as one unit with shared walls.
+    side has half a wall, so a run reads as one unit with shared walls.
     """
+    from slopkea_units import CORNER, unit_base
     cw_s = {"north": "east", "east": "south", "south": "west", "west": "north"}[facing]
     ccw_s = {"north": "west", "east": "north", "south": "east", "west": "south"}[facing]
     screen = {cw_s: cw, ccw_s: ccw}
     joined = {s for s, st in screen.items() if st == "j"}
     open_sides = set(SIDES) - joined
     cv = Canvas()
-    wall_open, wall_joined = 0.07, 0.035   # a shared wall is half of each cell's
-
-    def w(side):
-        return wall_joined if side in joined else wall_open
-
-    if facing in ("south", "north"):
-        top = 0.12
-        cv.rect((0, 0.02, 1, 0.98), TOP)                       # carcass
-        cv.rect((0, 0.02, 1, top), TOP_LIT)                    # top face
-        cv.rect((0, top - 0.008, 1, top), SEAM)
-        if facing == "south":
-            x0, x1 = w("west"), 1 - w("east")
-            for y0, y1 in ((top + 0.06, 0.53), (0.59, 0.94)):
-                cv.rect((x0, y0, x1, y1), CUBBY)
-                cv.rect((x0, y0, x1, y0 + 0.06), CUBBY_TOP)
-        else:
-            cv.rect((0, 0.555, 1, 0.565), SEAM)                # back panel: the shelf line shows through
-            cv.rect((0, 0.94, 1, 0.98), WALL)
-    else:
-        # Side views: we look down on the top and see the open front edge-on.
-        right = facing == "east"
-        # A joined end runs to the cell edge, so a column of units is one top.
-        ty0 = 0.0 if "north" in joined else 0.10
-        ty1 = 1.0 if "south" in joined else 0.90
-        cv.rect((0, ty0, 1, ty1), TOP)                         # top face
-        if "north" not in joined:
-            cv.rect((0, ty0, 1, ty0 + 0.03), TOP_LIT)
-        if "south" not in joined:
-            cv.rect((0, ty1 - 0.06, 1, ty1), WALL)             # end panel's wall
-        # The open front, edge-on: two cube openings per cell, split by the shelf.
-        fx0, fx1 = (0.80, 0.97) if right else (0.03, 0.20)
-        ya, yb = ty0 + w("north"), ty1 - w("south") - (0.06 if "south" not in joined else 0)
-        mid = (ya + yb) / 2
-        cv.rect((fx0, ya, fx1, mid - 0.02), CUBBY)
-        cv.rect((fx0, mid + 0.02, fx1, yb), CUBBY)
-    cv.silhouette(open_sides)
+    w = lambda side: 0.03 if side in joined else 0.06       # a shared wall is half of each cell's
+    u = unit_base(cv, facing, joined, strip_h=0.20)
+    if u["strip"] and facing == "south":
+        r = u["strip"]
+        cv.rect((r[0] + w("west"), r[1], r[2] - w("east"), r[3]), CUBBY)
+        cv.rect((r[0] + w("west"), r[1], r[2] - w("east"), r[1] + 0.025), CUBBY_TOP)
+        mid = (r[1] + r[3]) / 2
+        cv.rect((r[0], mid - 0.012, r[2], mid + 0.012), WALL)             # the shelf between the two cubes
+    if u["front"]:
+        f = u["front"]
+        ya, yb = f[1] + w("north"), f[3] - (w("south") if "south" in joined else 0.03)
+        cv.rect((f[0], ya, f[2], yb), CUBBY)
+    cv.silhouette(open_sides, corner=CORNER)
     cv.save(shelf_path(facing, cw, ccw), shelf_path(facing, cw, ccw, mask=True))
 
 

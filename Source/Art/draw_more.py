@@ -72,39 +72,30 @@ def draw_bench(facing, cw, ccw):
 # --- Wardrobe ----------------------------------------------------------------------
 
 def draw_wardrobe(facing, cw, ccw):
-    """A tall two-door wardrobe. Joined sides share a carcass wall, so a run reads
-    as one fitted wall of wardrobes. Door knobs are steel (untinted)."""
+    """A tall two-door wardrobe, seen from above like vanilla's storage: the top
+    covers the cell and the doors are on the strip along the screen-bottom edge
+    when it faces south, edge-on down the front in the side views. Knobs are steel."""
+    from slopkea_units import CORNER, gaps_x, gaps_y, unit_base
     joined = joined_of(facing, cw, ccw)
     open_sides = set(SIDES) - joined
     cv = Canvas()
-    w = lambda s: 0.015 if s in joined else 0.04
-    if facing in ("south", "north"):
-        cv.rect((0, 0.01, 1, 0.99), WALL)
-        cv.rect((0, 0.01, 1, 0.09), TOP_LIT)                             # top
-        cv.rect((0, 0.09, 1, 0.105), SEAM)
-        if facing == "south":
-            x0, x1 = w("west"), 1 - w("east")
-            for d0, d1 in ((x0, 0.495), (0.505, x1)):
-                cv.rect((d0, 0.12, d1, 0.94), TOP)                       # doors
-                cv.rect((d0, 0.12, d1, 0.14), TOP_LIT)
-            for kx in (0.46, 0.54):
-                cv.ellipse((kx - 0.018, 0.50, kx + 0.018, 0.536), STEEL, tint=False)
-            cv.rect((0, 0.94, 1, 0.99), WALL_DARK)                       # plinth
-        else:
-            cv.rect((0, 0.105, 1, 0.99), TOP)                            # plain back
-            cv.rect((0, 0.94, 1, 0.99), WALL_DARK)
-    else:
-        right = facing == "east"
-        y0, y1 = (0.0 if "north" in joined else 0.04), (1.0 if "south" in joined else 0.94)
-        cv.rect((0.04, y0, 0.96, y1), TOP)
-        if "north" not in joined:
-            cv.rect((0.04, y0, 0.96, y0 + 0.03), TOP_LIT)
-        if "south" not in joined:
-            cv.rect((0.04, y1 - 0.06, 0.96, y1), WALL)
-        fx0, fx1 = (0.82, 0.96) if right else (0.04, 0.18)               # doors, edge-on
-        cv.rect((fx0, y0 + w("north"), fx1, y1 - w("south")), WALL)
-        cv.rect((fx0, 0.495, fx1, 0.505), SEAM)
-    cv.silhouette(open_sides)
+    u = unit_base(cv, facing, joined, strip_h=0.22)
+    if u["strip"] and facing == "south":
+        r = u["strip"]
+        cv.rect((r[0], r[1] + 0.02, r[2], r[3] - 0.015), TOP)             # the doors
+        gaps_x(cv, r, joined)
+        for kx in (0.44, 0.56):
+            cy = (r[1] + r[3]) / 2
+            cv.ellipse((kx - 0.022, cy - 0.022, kx + 0.022, cy + 0.022), STEEL, tint=False)
+    if u["front"]:
+        f = u["front"]
+        cv.rect((f[0] + 0.015, f[1], f[2] - 0.015, f[3]), TOP)
+        gaps_y(cv, f, joined, WALL)
+        kx = f[2] - 0.03 if facing == "east" else f[0] + 0.03
+        for ky in (0.44, 0.56):
+            if f[1] < ky < f[3]:
+                cv.ellipse((kx - 0.02, ky - 0.02, kx + 0.02, ky + 0.02), STEEL, tint=False)
+    cv.silhouette(open_sides, corner=CORNER)
     cv.save(side_path("Wardrobe", facing, cw, ccw), side_path("Wardrobe", facing, cw, ccw, True))
 
 

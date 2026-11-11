@@ -85,6 +85,26 @@ def draw_table(i):
     cv.save(table_path(i))
 
 
+_RUN_ALPHA = {}
+
+
+def run_alpha(facing, pit=False):
+    """The finished silhouette of a plain run seat (joined both sides), at working
+    resolution. An inside corner is outlined against these, its real neighbours."""
+    key = (facing, pit)
+    if key not in _RUN_ALPHA:
+        cv = build_sectional(facing, "j", "j", pit=pit)
+        _RUN_ALPHA[key] = cv.img.getchannel("A").point(lambda v: 255 if v > 127 else 0)
+    return _RUN_ALPHA[key]
+
+
+def open_front(alpha, facing):
+    """The band of a run seat's cell left empty in front of it, as a pixel range
+    (lo, hi) along the facing axis."""
+    x0, y0, x1, y1 = alpha.getbbox()
+    return {"north": (0, y0), "west": (0, x0), "south": (y1, C), "east": (x1, C)}[facing]
+
+
 def side_inset(state):
     return {"a": ARM + GAP, "c": BACK + GAP, "j": 0.0}[state]
 
@@ -93,6 +113,15 @@ BACK_OUT, BACK_IN = (248, 248, 248), (192, 192, 192)   # backrest: rolled outer 
 
 
 def draw_sectional(facing, cw, ccw, back=False, pit=False):
+    cv = build_sectional(facing, cw, ccw, back, pit)
+    if pit:
+        from draw_pit import pitseat_path
+        cv.save(pitseat_path(facing, cw, ccw, back=back), pitseat_path(facing, cw, ccw, mask=True, back=back))
+    else:
+        cv.save(sect_path(facing, cw, ccw, back=back), sect_path(facing, cw, ccw, mask=True, back=back))
+
+
+def build_sectional(facing, cw, ccw, back=False, pit=False):
     """One seat of the sectional, drawn so the backrest FLOWS.
 
     The back and arms are bands of constant width along the seat's outer edges,
@@ -216,6 +245,17 @@ def draw_sectional(facing, cw, ccw, back=False, pit=False):
     cv.img.paste(band_rgb, (0, 0), union)
     cv.mask.paste((255, 0, 0), (0, 0), union)
 
+    # Height, the way vanilla's couch shows it: where a back or an arm runs along
+    # the screen-bottom edge, its face towards the camera is a darker strip under
+    # its top. A back is taller than an arm, so its strip is deeper.
+    if "south" in open_sides and not pit:
+        for r, outer, h in bands:
+            if outer != "south":
+                continue
+            depth = 0.11 if h >= H_BACK else 0.07
+            cv.rect((r[0], r[3] - depth, r[2], r[3]), WALL)
+            cv.rect((r[0], r[3] - depth, r[2], r[3] - depth + 0.014), WALL_DARK)
+
     # Tufting: identical buttons down the middle of each back band, on the same
     # thirds of a cell everywhere, so they line up across seats.
     for r, outer, h in bands:
@@ -260,12 +300,25 @@ def draw_sectional(facing, cw, ccw, back=False, pit=False):
         # no outline - the outline would fence the pit off like a raised object.
         from draw_pit import drop_edge
         drop_edge(cv, rims)
-    cv.silhouette(open_sides - set(rims) if pit else open_sides)
-    if pit:
-        from draw_pit import pitseat_path
-        cv.save(pitseat_path(facing, cw, ccw, back=back), pitseat_path(facing, cw, ccw, mask=True, back=back))
-    else:
-        cv.save(sect_path(facing, cw, ccw, back=back), sect_path(facing, cw, ccw, mask=True, back=back))
+    # An L's inside corner: a corner seat whose other side carries on as a run.
+    # The run's front and the perpendicular seat's front both end at this cell's
+    # corner. Cut this seat back to where those two fronts cross, and outline it
+    # against the two real neighbours, so the ring turns here and meets theirs.
+    context, diagonals = {}, set()
+    for state, other, side in ((cw, ccw, CCW[facing]), (ccw, cw, CW[facing])):
+        if state == "c" and other == "j":
+            run, across = run_alpha(facing, pit), run_alpha(side, pit)   # beyond `side`; in front
+            context = {side: run, facing: across}
+            spans = {facing: open_front(run, facing), side: open_front(across, side)}
+            xs = spans["east"] if "east" in spans else spans["west"]
+            ys = spans["south"] if "south" in spans else spans["north"]
+            if xs[1] > xs[0] and ys[1] > ys[0]:
+                box = [xs[0], ys[0], xs[1] - 1, ys[1] - 1]
+                cv.d.rectangle(box, fill=(0, 0, 0, 0))
+                cv.md.rectangle(box, fill=(0, 0, 0))
+            diagonals.add(("south" if "south" in spans else "north", "east" if "east" in spans else "west"))
+    cv.silhouette(open_sides - set(rims) if pit else open_sides, context=context, empty_diagonals=diagonals)
+    return cv
 
 
 def rocker_path(kind, facing, mask=False):

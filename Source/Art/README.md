@@ -81,6 +81,15 @@ neighbours.
   side where a part runs on into the same part of the next piece. That keeps the backrest one
   band all the way round an L or U, and the seating one unbroken surface inside it.
 
+* **Inside corners turn the outline.** In an L, the corner seat has both its front and its
+  run side joined, but the cell diagonally inside the L is empty, and the two seats either
+  side stop a little short of their cell edges. The corner seat is cut back to where those
+  two fronts cross and outlined against its real neighbours: `silhouette(..., context=,
+  empty_diagonals=)` takes the finished silhouettes of the two run seats (`run_alpha`), so
+  the ring turns inside the corner seat and runs pixel for pixel into theirs. Nothing is
+  restated as a number. `verify_art.py` assembles every L and fails if any tinted pixel
+  touches the floor at the inside corner.
+
 ## Rocking chairs
 
 Free-standing, so they have one view per facing and no variants:
@@ -151,12 +160,34 @@ These are in `draw_kitchen.py`. They join along their sides like the cube shelvi
 The three kitchen modules join *each other* (`ISlopkeaKitchenModule` in the C#), so a run can
 mix them in any order.
 
-* **Stuff is the carcass.** The worktop is a fixed pale stone, and the handles, basin, hob
-  and knobs are fixed steel and black glass, all black in the mask.
-* **The worktop overhangs,** so it always runs edge to edge. Only the carcass is inset at an
-  open end.
-* **Doors are recessed panels,** made of tone steps and never outlined. Side views show the
-  doors edge-on.
+* **Seen from above, like vanilla's benches.** The counters are laid out off vanilla's
+  electric stove (`TableStoveElectric`, 224x96 for 3x1): the worktop covers the cell in every
+  facing, about 0.85 of a cell deep, and the bench's height shows as one strip about 0.13 of
+  a cell tall along the screen-bottom edge only - the south face, whichever way it faces.
+  There is no door elevation: that was what made the counters read as half-depth.
+* **Stuff is the carcass:** the strip under the worktop, and the doors' top edge along the
+  front in the east and west views. The worktop is a fixed pale stone, and the basin, tap,
+  hob plate and knobs are fixed steel, all black in the mask.
+* **Nothing sits on a cell boundary.** Door gaps fall every half cell, the same on a boundary
+  as inside a module, so a run reads as one counter.
+* **Fittings are never squashed.** The hob is a steel plate with four ringed burners, each
+  about 0.3 of a cell across, with its controls along the plate's front; the sink's tap is at
+  the back. Only those swap ends between facings.
+* **Nearly square corners** (`silhouette(corner=0.012)`), as vanilla's benches have.
+* **Tall units follow the same rule** (`slopkea_units.py`): hutch, wall oven and fridge are
+  seen from above, with a taller strip (0.22 of a cell) because they are taller. The front is
+  on that strip only when the unit faces south; facing north it is the plain back, and facing
+  east or west the front is a band down that side.
+* The wall cabinets are still drawn the old way (door fronts when facing south).
+
+## One projection for storage
+
+The wardrobe, cube shelving and bookcase use `slopkea_units.py` too, so every facing of a
+piece is the same view: top covering the cell, the camera-side face as a strip along the
+screen-bottom edge, square corners (`CORNER`). Before, their south view was a front
+elevation and the other three were tops, so a piece changed projection when rotated. The
+bookcase is laid out like vanilla's one-cell `BookcaseSmall` (frame, shadowed recess, pale
+shelf floor, face strip), since vanilla's code draws the books over it.
 * **The bookcase is drawn empty.** It is vanilla's `Building_Bookcase`, which draws the
   books actually stored in it, in real time, over the case. The subclass only overrides
   `Graphic` with a `Graphic_Multi` per join state. That is why its files are named
