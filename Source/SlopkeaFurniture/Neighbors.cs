@@ -30,6 +30,37 @@ namespace SlopkeaFurniture
         }
 
         /// <summary>
+        /// Inside corners of a dragged shape: a bit is set where both sides have a
+        /// matching neighbour but the cell diagonally between them does not, so
+        /// the outline has to turn the corner inside this cell. NE=1, SE=2, SW=4,
+        /// NW=8. Must match Source/Art/slopkea_units.py (CORNER_BITS).
+        /// </summary>
+        public static int InsideCornerBits<T>(Thing self) where T : Thing
+        {
+            int c = 0;
+            IntVec3 n = IntVec3.North, e = IntVec3.East, s = IntVec3.South, w = IntVec3.West;
+            bool hasN = Get<T>(self, n) != null, hasE = Get<T>(self, e) != null;
+            bool hasS = Get<T>(self, s) != null, hasW = Get<T>(self, w) != null;
+            if (hasN && hasE && Get<T>(self, n + e) == null) c |= 1;
+            if (hasS && hasE && Get<T>(self, s + e) == null) c |= 2;
+            if (hasS && hasW && Get<T>(self, s + w) == null) c |= 4;
+            if (hasN && hasW && Get<T>(self, n + w) == null) c |= 8;
+            return c;
+        }
+
+        /// <summary>
+        /// The texture name's tail for a drag-to-shape cell: its side bits, plus
+        /// "_&lt;corner bits&gt;" when it sits at an inside corner. Must match
+        /// Source/Art/slopkea_units.py (variant_name).
+        /// </summary>
+        public static string ShapeVariant<T>(Thing self) where T : Thing
+        {
+            int corners = InsideCornerBits<T>(self);
+            int sides = JoinedBits<T>(self);
+            return corners == 0 ? sides.ToString() : sides + "_" + corners;
+        }
+
+        /// <summary>
         /// A wall, or anything wall-like (natural rock, a full impassable block),
         /// in the cell in direction `dir`: furniture runs flush up to it.
         /// </summary>

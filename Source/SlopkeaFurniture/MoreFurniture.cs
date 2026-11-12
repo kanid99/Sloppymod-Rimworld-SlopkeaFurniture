@@ -94,7 +94,7 @@ namespace SlopkeaFurniture
         }
 
         public override void Print(SectionLayer layer) =>
-            Neighbors.PrintVariant(layer, this, MorePaths.Planter + Neighbors.JoinedBits<Building_SlopkeaPlanter>(this),
+            Neighbors.PrintVariant(layer, this, MorePaths.Planter + Neighbors.ShapeVariant<Building_SlopkeaPlanter>(this),
                 ShaderDatabase.CutoutComplex);
     }
 }

@@ -29,7 +29,7 @@ namespace SlopkeaFurniture
 
         public override void Print(SectionLayer layer)
         {
-            Neighbors.PrintVariant(layer, this, TexPrefix + Neighbors.JoinedBits<Building_SlopkeaDesk>(this),
+            Neighbors.PrintVariant(layer, this, TexPrefix + Neighbors.ShapeVariant<Building_SlopkeaDesk>(this),
                 ShaderDatabase.CutoutComplex);
         }
     }

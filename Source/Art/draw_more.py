@@ -3,7 +3,8 @@ planter box (drag-to-shape, bit variants). Same join contracts as the rest."""
 import os
 import shutil
 
-from slopkea_units import CORNER
+from slopkea_units import CORNER, corner_variants, corners_of, inside_corner_outline
+from slopkea_units import variant_name
 from slopkea_draw import SEAM, TOP, TOP_LIT, WALL, WALL_DARK, FOOT, Canvas
 
 ROOT = "Textures/Things/Building/Furniture/Slopkea"
@@ -28,8 +29,8 @@ def divider_path(i, mask=False):
     return f"{DIVIDER_DIR}/Slopkea_Divider_{i}{'_m' if mask else ''}.png"
 
 
-def planter_path(i, mask=False):
-    return f"{PLANTER_DIR}/Slopkea_Planter_{i}{'_m' if mask else ''}.png"
+def planter_path(i, mask=False, c=0):
+    return f"{PLANTER_DIR}/Slopkea_Planter_{variant_name(i, c)}{'_m' if mask else ''}.png"
 
 
 def joined_of(facing, cw, ccw):
@@ -137,10 +138,24 @@ def draw_divider(i):
 
 # --- Planter box -------------------------------------------------------------------
 
-def draw_planter(i):
+_PLANTER_ALPHA = {}
+
+
+def planter_alpha(i):
+    if i not in _PLANTER_ALPHA:
+        _PLANTER_ALPHA[i] = build_planter(i).img.getchannel("A").point(lambda v: 255 if v > 127 else 0)
+    return _PLANTER_ALPHA[i]
+
+
+def draw_planter(i, c=0):
+    build_planter(i, c).save(planter_path(i, c=c), planter_path(i, True, c=c))
+
+
+def build_planter(i, c=0):
     """A raised timber bed. The rim runs only round the outside of the dragged
     shape, so the soil is one continuous bed; the front rim shows its wall.
-    Soil is untinted; the timber takes the stuff."""
+    Soil is untinted; the timber takes the stuff. c marks inside corners (see
+    slopkea_units.corner_variants): there the rim turns inside this cell."""
     joined = {s for s, b in BITS.items() if i & b}
     open_sides = set(SIDES) - joined
     cv = Canvas()
@@ -163,8 +178,17 @@ def draw_planter(i):
         cv.rect((0, bottom - rim, 1, bottom), TOP)
         cv.rect((0, bottom, 1, 1.0), WALL)                               # front board
         cv.rect((0, bottom, 1, bottom + 0.01), WALL_DARK)
-    cv.silhouette(open_sides, corner=CORNER)
-    cv.save(planter_path(i), planter_path(i, True))
+    for ns, ew in corners_of(c):                                         # the rim turns the inside corner
+        x0 = 1 - rim if ew == "east" else 0.0
+        if ns == "north":
+            cv.rect((x0, 0.0, x0 + rim, rim), TOP)
+        else:
+            # The neighbour's south rim sits above its front board, at 0.88 - rim;
+            # the rim below us runs up this cell's edge to meet it there.
+            cv.rect((x0, 0.88 - rim, x0 + rim, 1.0), TOP)
+    context, diagonals = inside_corner_outline(cv, corners_of(c), planter_alpha)
+    cv.silhouette(open_sides, corner=CORNER, context=context, empty_diagonals=diagonals)
+    return cv
 
 
 def draw_all():
@@ -182,3 +206,5 @@ def draw_all():
     for i in range(16):
         draw_divider(i)
         draw_planter(i)
+    for i, c in corner_variants():
+        draw_planter(i, c)

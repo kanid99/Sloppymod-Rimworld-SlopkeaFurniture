@@ -10,7 +10,7 @@ import shutil
 
 from PIL import Image, ImageChops, ImageDraw, ImageFilter
 
-from slopkea_units import CORNER
+from slopkea_units import CORNER, corner_variants, corners_of, inside_corner_outline, variant_name
 from slopkea_draw import (C, px, SS, LIFT, CCW, CW, OPP, SEAM, TOP, TOP_LIT, WALL, WALL_DARK, FOOT,
                           Canvas, local_rect)
 
@@ -39,8 +39,8 @@ TABLE_TOP_END = 0.76     # where the top face stops when the front (south) is op
 TABLE_APRON_END = 0.85   # apron (the table's wall) below it; legs below that
 
 
-def table_path(i):
-    return f"{TABLE_DIR}/Slopkea_Table_{i}.png"
+def table_path(i, c=0):
+    return f"{TABLE_DIR}/Slopkea_Table_{variant_name(i, c)}.png"
 
 
 def sect_path(facing, cw, ccw, mask=False, back=False):
@@ -53,7 +53,21 @@ def sect_path(facing, cw, ccw, mask=False, back=False):
     return f"{SECT_DIR}/Slopkea_Sectional_{facing}_{cw}{ccw}{suffix}{'_m' if mask else ''}.png"
 
 
-def draw_table(i):
+_TABLE_ALPHA = {}
+
+
+def table_alpha(i):
+    if i not in _TABLE_ALPHA:
+        _TABLE_ALPHA[i] = build_table(i).img.getchannel("A").point(lambda v: 255 if v > 127 else 0)
+    return _TABLE_ALPHA[i]
+
+
+def draw_table(i, c=0):
+    build_table(i, c).save(table_path(i, c))
+
+
+def build_table(i, c=0):
+    """Side bits i; c marks inside corners (see slopkea_units.corner_variants)."""
     joined = {s for s, b in BITS.items() if i & b}
     open_sides = set(BITS) - joined
     cv = Canvas()
@@ -82,8 +96,9 @@ def draw_table(i):
         if "east" in open_sides:
             cv.rect((0.81, TABLE_APRON_END, 0.96, 1.0), WALL)
             cv.rect((0.81, TABLE_APRON_END, 0.84, 1.0), TOP)
-    cv.silhouette(open_sides, corner=CORNER)      # square, like vanilla's tables
-    cv.save(table_path(i))
+    context, diagonals = inside_corner_outline(cv, corners_of(c), table_alpha)
+    cv.silhouette(open_sides, corner=CORNER, context=context, empty_diagonals=diagonals)   # square, like vanilla's tables
+    return cv
 
 
 _RUN_ALPHA = {}
@@ -555,6 +570,8 @@ def main():
         os.makedirs(d)
     for i in range(16):
         draw_table(i)
+    for i, c in corner_variants():
+        draw_table(i, c)
     for facing in FACINGS:
         for cw in SIDE_STATES:
             for ccw in SIDE_STATES:

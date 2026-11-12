@@ -5,7 +5,7 @@ C# prints the one its neighbours call for. verify_art.py checks the two agree.
 """
 from PIL import Image
 
-from slopkea_units import CORNER
+from slopkea_units import CORNER, corner_variants, corners_of, inside_corner_outline, variant_name
 from slopkea_draw import (SS, FOOT, SEAM, TOP, TOP_LIT, WALL, WALL_DARK, Canvas)
 
 ROOT = "Textures/Things/Building/Furniture/Slopkea"
@@ -21,8 +21,8 @@ CORNERS = {"ne": ("north", "east", 1), "se": ("south", "east", 2),
            "sw": ("south", "west", 4), "nw": ("north", "west", 8)}
 
 
-def desk_path(i, mask=False):
-    return f"{DESK_DIR}/Slopkea_Desk_{i}{'_m' if mask else ''}.png"
+def desk_path(i, mask=False, c=0):
+    return f"{DESK_DIR}/Slopkea_Desk_{variant_name(i, c)}{'_m' if mask else ''}.png"
 
 
 def rug_path(i, c):
@@ -47,9 +47,23 @@ DESK_TOP_END = 0.78   # a slimmer top than the table's: it's a laminate slab, no
 DESK_EDGE_END = 0.84
 
 
-def draw_desk(i):
+_DESK_ALPHA = {}
+
+
+def desk_alpha(i):
+    if i not in _DESK_ALPHA:
+        _DESK_ALPHA[i] = build_desk(i).img.getchannel("A").point(lambda v: 255 if v > 127 else 0)
+    return _DESK_ALPHA[i]
+
+
+def draw_desk(i, c=0):
+    build_desk(i, c).save(desk_path(i, c=c), desk_path(i, mask=True, c=c))
+
+
+def build_desk(i, c=0):
     """A LINNMON-style desk: a smooth slab, a light edge band all round the outside
-    of the shape, and slim steel legs at outside corners only (untinted)."""
+    of the shape, and slim steel legs at outside corners only (untinted). c marks
+    inside corners (see slopkea_units.corner_variants)."""
     joined = {s for s, b in BITS.items() if i & b}
     open_sides = set(SIDES) - joined
     cv = Canvas()
@@ -69,8 +83,9 @@ def draw_desk(i):
         for side, x0 in (("west", 0.05), ("east", 0.86)):
             if side in open_sides:
                 cv.rect((x0, DESK_EDGE_END, x0 + 0.09, 1.0), FOOT, tint=False)
-    cv.silhouette(open_sides, corner=CORNER)
-    cv.save(desk_path(i), desk_path(i, mask=True))
+    context, diagonals = inside_corner_outline(cv, corners_of(c), desk_alpha)
+    cv.silhouette(open_sides, corner=CORNER, context=context, empty_diagonals=diagonals)
+    return cv
 
 
 # --- Rug ----------------------------------------------------------------------------
@@ -171,6 +186,8 @@ def draw_all():
         os.makedirs(d)
     for i in range(16):
         draw_desk(i)
+    for i, c in corner_variants():
+        draw_desk(i, c)
     n = 0
     for i, c in rug_variants():
         draw_rug(i, c)

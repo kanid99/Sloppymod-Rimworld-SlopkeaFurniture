@@ -93,6 +93,13 @@ neighbours.
   restated as a number. `verify_art.py` assembles every L and fails if any tinted pixel
   touches the floor at the inside corner.
 
+* **The table, desk and planter turn inside corners too.** Their side bits cannot say that
+  the cell diagonally inside an L is empty, so a cell there gets a second number, the rug's
+  scheme: NE=1, SE=2, SW=4, NW=8, written `<sides>_<corners>` (`variant_name`; the plain
+  `<sides>` names are unchanged). `inside_corner_outline` (`slopkea_units.py`) outlines the
+  corner cell against its two real neighbours, and the planter's rim turns there as well.
+  The C# picks the name with `Neighbors.ShapeVariant`. 31 extra variants per piece.
+
 ## Rocking chairs
 
 Free-standing, so they have one view per facing and no variants:

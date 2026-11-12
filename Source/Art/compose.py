@@ -64,6 +64,17 @@ def bits_index(cells, cell):
     return sum(b for side, b in BITS.items() if step(cell, side) in cells)
 
 
+def inside_corners(cells, cell):
+    """Mirror of Neighbors.InsideCornerBits, for the table, desk and planter."""
+    from slopkea_units import CORNER_BITS
+    c = 0
+    for (ns, ew), bit in CORNER_BITS.items():
+        a, b = step(cell, ns), step(cell, ew)
+        if a in cells and b in cells and step(a, ew) not in cells:
+            c |= bit
+    return c
+
+
 def rug_corners(cells, cell):
     """Mirror of Building_SlopkeaRug.CornerBits."""
     from draw_modular import CORNERS
@@ -98,10 +109,12 @@ def render(scene, colors, size, cell_px=CELL, bg=(92, 84, 72), rugs=()):
     same = lambda kind: {c for c, t in scene.items() if t[0] == kind}
     for (x, z), thing in scene.items():
         if thing[0] == "table":
-            tile = tinted(table_path(table_index(scene, (x, z))), colors["table"])
+            tile = tinted(table_path(table_index(scene, (x, z)), inside_corners(same("table"), (x, z))),
+                          colors["table"])
         elif thing[0] == "desk":
             i = bits_index(same("desk"), (x, z))
-            tile = tinted(desk_path(i), colors.get("desk", (235, 232, 222)), desk_path(i, True))
+            k = inside_corners(same("desk"), (x, z))
+            tile = tinted(desk_path(i, c=k), colors.get("desk", (235, 232, 222)), desk_path(i, True, c=k))
         elif thing[0] in ("Cabinet", "Sink", "Hob", "book"):
             from draw_kitchen import book_path, kitchen_path
             kitchen = ("Cabinet", "Sink", "Hob")
@@ -127,7 +140,11 @@ def render(scene, colors, size, cell_px=CELL, bg=(92, 84, 72), rugs=()):
             from draw_more import divider_path, planter_path
             fn = divider_path if thing[0] == "divider" else planter_path
             i = bits_index(same(thing[0]), (x, z))
-            tile = tinted(fn(i), colors.get(thing[0], (170, 120, 80)), fn(i, True))
+            if thing[0] == "planter":
+                k = inside_corners(same("planter"), (x, z))
+                tile = tinted(fn(i, c=k), colors.get(thing[0], (170, 120, 80)), fn(i, True, c=k))
+            else:
+                tile = tinted(fn(i), colors.get(thing[0], (170, 120, 80)), fn(i, True))
         elif thing[0] == "shelf":
             cw, ccw = shelf_states(scene, (x, z))
             tile = tinted(shelf_path(thing[1], cw, ccw), colors.get("shelf", (240, 240, 236)),

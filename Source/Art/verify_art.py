@@ -281,6 +281,23 @@ for cx, cz in ((0, 2), (2, 2), (0, 0), (2, 0)):
             check(g == 0, f"{name} L, corner seat facing {cface} at {(cx, cz)}: "
                           f"outline does not turn the inside corner ({g}px unoutlined)")
 
+# The table, desk and planter have inside-corner variants too (Neighbors.ShapeVariant):
+# every one must exist, and an L in each of its four turns must close its outline.
+from slopkea_units import corner_variants
+for i, c in corner_variants():
+    for q in (table_path(i, c), dm.desk_path(i, c=c), dm.desk_path(i, True, c=c),
+              dmo.planter_path(i, c=c), dmo.planter_path(i, True, c=c)):
+        check(os.path.exists(q), f"missing {q}")
+for kind, fn in (("table", lambda i, k: table_path(i, k)), ("desk", lambda i, k: dm.desk_path(i, c=k)),
+                 ("planter", lambda i, k: dmo.planter_path(i, c=k))):
+    for cx, cz in ((0, 2), (2, 2), (0, 0), (2, 0)):
+        cells = {(x, cz) for x in range(3)} | {(cx, z) for z in range(3)}
+        tiles = {cell: fn(compose.bits_index(cells, cell), compose.inside_corners(cells, cell)) for cell in cells}
+        g = inside_corner_gaps(tiles, cx, cz)
+        check(g == 0, f"{kind} L with its corner at {(cx, cz)}: outline does not turn the inside corner ({g}px unoutlined)")
+ns_src = open("Source/SlopkeaFurniture/Neighbors.cs").read()
+check("c |= 1;" in ns_src and "ShapeVariant" in ns_src, "Neighbors.cs: InsideCornerBits / ShapeVariant missing")
+
 if errors:
     print("\n".join(errors))
     sys.exit(1)

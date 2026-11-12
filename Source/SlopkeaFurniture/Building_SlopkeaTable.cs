@@ -35,7 +35,8 @@ namespace SlopkeaFurniture
 
         public override void Print(SectionLayer layer)
         {
-            Neighbors.PrintVariant(layer, this, TexPrefix + VariantIndex(), ShaderDatabase.Cutout);
+            Neighbors.PrintVariant(layer, this, TexPrefix + Neighbors.ShapeVariant<Building_SlopkeaTable>(this),
+                ShaderDatabase.Cutout);
         }
     }
 }
