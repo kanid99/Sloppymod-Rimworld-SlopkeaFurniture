@@ -106,7 +106,12 @@ def draw_wardrobe(facing, cw, ccw):
 def draw_divider(i):
     """A folding paper screen. It follows its joins: a run east-west shows the
     panels face-on; a run north-south is seen edge-on, as the frame's top rail.
-    Posts stand where panels hinge. Paper is fixed (untinted); the frame is stuff."""
+    Posts stand where panels hinge. Paper is fixed (untinted); the frame is stuff.
+
+    Where the screen turns a corner in this cell - a north or south join and
+    only one of east and west - the face-on part is half a cell: one panel, from
+    the centre post to the joined side. The edge-on rail runs down the centre of
+    its column, so a full panel there stuck out half a cell past the corner."""
     joined = {s for s, b in BITS.items() if i & b}
     open_sides = set(SIDES) - joined
     cv = Canvas()
@@ -120,9 +125,15 @@ def draw_divider(i):
     if ew:
         x0 = 0.0 if "west" in joined else 0.08
         x1 = 1.0 if "east" in joined else 0.92
+        turn = bool(joined & {"north", "south"}) and len(joined & {"east", "west"}) == 1
+        if turn:
+            x0, x1 = (0.47, x1) if "east" in joined else (x0, 0.53)
         cv.rect((x0, 0.12, x1, 0.80), TOP)                               # frame
         cv.rect((x0, 0.12, x1, 0.15), TOP_LIT)
-        for p0, p1 in ((max(x0, 0.0) + 0.05, 0.47), (0.53, min(x1, 1.0) - 0.05)):
+        panels = [(max(x0, 0.0) + 0.05, 0.47), (0.53, min(x1, 1.0) - 0.05)]
+        for p0, p1 in panels:
+            if p1 - p0 < 0.2:
+                continue                                                  # the half this cell does not have
             cv.rect((p0, 0.19, p1, 0.74), PAPER, tint=False)             # paper panels
             cv.rect((p0, 0.19, p1, 0.21), PAPER_LIT, tint=False)
             for k in (1, 2, 3):
@@ -130,7 +141,7 @@ def draw_divider(i):
                 cv.rect((p0, y - 0.005, p1, y + 0.005), WALL, tint=True)  # lattice
         cv.rect((0.47, 0.12, 0.53, 0.86), WALL)                           # hinge post
         for side, fx in (("west", x0), ("east", x1 - 0.06)):
-            if side not in joined:
+            if side not in joined and not turn:
                 cv.rect((fx, 0.12, fx + 0.06, 0.86), WALL)               # end posts
     cv.silhouette(open_sides, corner=CORNER)
     cv.save(divider_path(i), divider_path(i, True))

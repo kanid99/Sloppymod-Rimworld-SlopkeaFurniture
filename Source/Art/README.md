@@ -100,6 +100,10 @@ neighbours.
   corner cell against its two real neighbours, and the planter's rim turns there as well.
   The C# picks the name with `Neighbors.ShapeVariant`. 31 extra variants per piece.
 
+* **Cushions part with a crease, not a line.** Between two joined seats the cushion is shaded
+  towards the cell edge (`crease`, 0.045 of a cell deep, 15% at the edge), half from each seat.
+  It was a hard seam on the boundary, which marked every cell of a run.
+
 ## Rocking chairs
 
 Free-standing, so they have one view per facing and no variants:
@@ -220,7 +224,9 @@ shelving. The divider and planter take bit variants like the table.
   between joined units.
 * **Divider:** it follows its joins. An east-west run shows the paper panels face-on, and a
   north-south run is seen edge-on as the frame's top rail, so a corner shows both. The paper
-  is untinted, and the frame and lattice take the stuff colour.
+  is untinted, and the frame and lattice take the stuff colour. Where the run turns in a cell (a north or south join and
+  only one of east and west) the face-on part is half a cell, one panel hinged on the centre
+  post, so the corner meets the edge-on rail instead of sticking out half a cell past it.
 * **Planter:** the soil is untinted, and the timber rim runs only round the outside of the
   dragged shape, so the bed reads as one. Furrows sit on fixed fractions of the cell, so they
   line up across cells.

@@ -128,6 +128,31 @@ def side_inset(state):
 BACK_OUT, BACK_IN = (248, 248, 248), (192, 192, 192)   # backrest: rolled outer edge to seat side
 
 
+CREASE = 0.045          # how far a crease fades into the seat, in cells
+CREASE_DEPTH = 0.15     # how dark it is on the cell edge
+
+
+def crease(cv, r, edge):
+    """Shade rect r towards its `edge` side (a screen side): CREASE_DEPTH dark on
+    that edge, fading to nothing across the rect. Only where something is drawn."""
+    x0, y0, x1, y1 = (px(v) for v in r)
+    w, h = x1 - x0, y1 - y0
+    if w <= 0 or h <= 0:
+        return
+    across = w if edge in ("east", "west") else h
+    ramp = Image.new("L", (across, 1))
+    ramp.putdata([int(255 * CREASE_DEPTH * (1 - k / float(across)) ** 1.6) for k in range(across)])
+    if edge in ("east", "south"):
+        ramp = ramp.transpose(Image.FLIP_LEFT_RIGHT)       # darkest at the far end
+    if edge in ("north", "south"):
+        ramp = ramp.transpose(Image.ROTATE_270)            # run it down the screen
+    alpha = ramp.resize((w, h))
+    alpha = ImageChops.multiply(alpha, cv.img.crop((x0, y0, x1, y1)).getchannel("A"))
+    shade = Image.new("RGBA", (w, h), (0, 0, 0, 255))
+    shade.putalpha(alpha)
+    cv.img.alpha_composite(shade, (x0, y0))
+
+
 def draw_sectional(facing, cw, ccw, back=False, pit=False):
     cv = build_sectional(facing, cw, ccw, back, pit)
     if pit:
@@ -185,12 +210,15 @@ def build_sectional(facing, cw, ccw, back=False, pit=False):
     f0 = 0.0 if (front_joined or post) else 0.05
     cushion = local_rect(facing, 0, 1, f0, 1)
     cv.slab(cushion, H_CUSHION, joined=runs_on(cushion))
+    # Between two cushions: a soft crease, darkest on the cell edge and fading
+    # into each seat, the way vanilla's couch parts its cushions. It used to be
+    # a hard line, which marked every cell of a run.
     if ccw == "j":
-        cv.rect(local_rect(facing, 0, 0.012, f0, 1), SEAM)
+        crease(cv, local_rect(facing, 0, CREASE, f0, 1), CCW[facing])
     if cw == "j":
-        cv.rect(local_rect(facing, 0.988, 1, f0, 1), SEAM)
+        crease(cv, local_rect(facing, 1 - CREASE, 1, f0, 1), CW[facing])
     if post:
-        cv.rect(local_rect(facing, 0, 1, 0.988, 1), SEAM)    # meets the next seat's side
+        crease(cv, local_rect(facing, 0, 1, 1 - CREASE, 1), OPP[facing])    # meets the next seat's side
 
     # Bands: (screen rect, the screen side that is its rolled outer edge, height).
     # Round a post there are none: the seat is cushion all round.
