@@ -50,7 +50,10 @@ What the pass changed, all in `Canvas.silhouette`, so every piece got it at once
 * **Outline 4px to 7px at 192px a cell.** Ours was half VFE's weight and vanished at play
   zoom. Thin parts are scaled to match: the chairs 5px, the rug 4px.
 * **Rounded outer corners.** VFE rounds every silhouette corner, and square corners were
-  what made ours read as boxes.
+  what made ours read as boxes. *Since narrowed:* against vanilla's own tables, benches and
+  bookcase, hard furniture is nearly square, so everything built of boards now passes
+  `corner=CORNER` (0.012 of a cell, `slopkea_units.py`). Only upholstery, the rug, the woven
+  rattan swing and the chairs keep the soft 0.035 corner.
 * **Edge light.** A soft lift towards white just inside up-left-facing edges, and a sink
   towards black inside down-right ones. This is VFE's airbrushed rim, done as tone and not
   as a line. It is what doubled the grey levels.

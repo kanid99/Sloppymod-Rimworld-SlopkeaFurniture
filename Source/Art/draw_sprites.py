@@ -10,6 +10,7 @@ import shutil
 
 from PIL import Image, ImageChops, ImageDraw, ImageFilter
 
+from slopkea_units import CORNER
 from slopkea_draw import (C, px, SS, LIFT, CCW, CW, OPP, SEAM, TOP, TOP_LIT, WALL, WALL_DARK, FOOT,
                           Canvas, local_rect)
 
@@ -81,7 +82,7 @@ def draw_table(i):
         if "east" in open_sides:
             cv.rect((0.81, TABLE_APRON_END, 0.96, 1.0), WALL)
             cv.rect((0.81, TABLE_APRON_END, 0.84, 1.0), TOP)
-    cv.silhouette(open_sides)
+    cv.silhouette(open_sides, corner=CORNER)      # square, like vanilla's tables
     cv.save(table_path(i))
 
 

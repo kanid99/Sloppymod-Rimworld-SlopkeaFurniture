@@ -3,6 +3,7 @@ planter box (drag-to-shape, bit variants). Same join contracts as the rest."""
 import os
 import shutil
 
+from slopkea_units import CORNER
 from slopkea_draw import SEAM, TOP, TOP_LIT, WALL, WALL_DARK, FOOT, Canvas
 
 ROOT = "Textures/Things/Building/Furniture/Slopkea"
@@ -65,7 +66,7 @@ def draw_bench(facing, cw, ccw):
             cv.rect((0.33, y1 - 0.06, 0.67, y1), WALL)                   # end grain
             for lx in (0.36, 0.58):
                 cv.rect((lx, y1, lx + 0.06, min(1.0, y1 + 0.08)), WALL_DARK)
-    cv.silhouette(open_sides)
+    cv.silhouette(open_sides, corner=CORNER)
     cv.save(side_path("Bench", facing, cw, ccw), side_path("Bench", facing, cw, ccw, True))
 
 
@@ -130,7 +131,7 @@ def draw_divider(i):
         for side, fx in (("west", x0), ("east", x1 - 0.06)):
             if side not in joined:
                 cv.rect((fx, 0.12, fx + 0.06, 0.86), WALL)               # end posts
-    cv.silhouette(open_sides)
+    cv.silhouette(open_sides, corner=CORNER)
     cv.save(divider_path(i), divider_path(i, True))
 
 
@@ -162,7 +163,7 @@ def draw_planter(i):
         cv.rect((0, bottom - rim, 1, bottom), TOP)
         cv.rect((0, bottom, 1, 1.0), WALL)                               # front board
         cv.rect((0, bottom, 1, bottom + 0.01), WALL_DARK)
-    cv.silhouette(open_sides)
+    cv.silhouette(open_sides, corner=CORNER)
     cv.save(planter_path(i), planter_path(i, True))
 
 

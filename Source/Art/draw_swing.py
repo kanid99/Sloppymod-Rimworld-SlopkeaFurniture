@@ -41,12 +41,12 @@ class Big(Canvas):
         self.d = ImageDraw.Draw(self.img)
         self.md = ImageDraw.Draw(self.mask)
 
-    def finish(self, ring=RING):
+    def finish(self, ring=RING, corner=0.03):
         """Rounded corners, edge light and the black ring - Canvas.silhouette's
         treatment, for an all-open, multi-cell sprite."""
         W, H = self.img.size
         a = self.img.getchannel("A").point(lambda v: 255 if v > 127 else 0)
-        rounded = a.filter(ImageFilter.GaussianBlur(int(0.03 * C))).point(lambda v: 255 if v > 150 else 0)
+        rounded = a.filter(ImageFilter.GaussianBlur(int(corner * C))).point(lambda v: 255 if v > 150 else 0)
         cut = ImageChops.subtract(a, rounded)
         if cut.getbbox():
             self.img.paste(Image.new("RGBA", (W, H), (0, 0, 0, 0)), (0, 0), cut)
@@ -237,7 +237,9 @@ def draw_swing(kind, facing):
             arm = R(a0, 0.08, a0 + 0.14, 0.92)
             cv.rect(arm, F, ft)
             cv.rect(lit_edge(arm, 0.03), F_LIT, ft)
-    cv.finish(ring=6 * 4)
+    # Timber and painted boards have square corners, like the rest of the hard
+    # furniture; the woven rattan shell keeps its soft ones.
+    cv.finish(ring=6 * 4, corner=0.03 if kind == "Rattan" else 0.012)
     # Hung after the outline, so the ropes sit in front with their own edge. From
     # above each rope is its knot on the end rail and a short run up the screen.
     for a_ in (0.13, 1.87):

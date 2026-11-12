@@ -5,6 +5,7 @@ C# prints the one its neighbours call for. verify_art.py checks the two agree.
 """
 from PIL import Image
 
+from slopkea_units import CORNER
 from slopkea_draw import (SS, FOOT, SEAM, TOP, TOP_LIT, WALL, WALL_DARK, Canvas)
 
 ROOT = "Textures/Things/Building/Furniture/Slopkea"
@@ -68,7 +69,7 @@ def draw_desk(i):
         for side, x0 in (("west", 0.05), ("east", 0.86)):
             if side in open_sides:
                 cv.rect((x0, DESK_EDGE_END, x0 + 0.09, 1.0), FOOT, tint=False)
-    cv.silhouette(open_sides)
+    cv.silhouette(open_sides, corner=CORNER)
     cv.save(desk_path(i), desk_path(i, mask=True))
 
 

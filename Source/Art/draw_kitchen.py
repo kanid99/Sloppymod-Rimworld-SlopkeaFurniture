@@ -237,7 +237,7 @@ def draw_bookends():
         x0, y0 = (1 - w) / 2, (1 - h) / 2
         cv.rect((x0, y0, x0 + w, y0 + h), STEEL, tint=False)
         cv.rect((x0, y0, x0 + w, y0 + min(w, h) * 0.2), STEEL_LIT, tint=False)
-        cv.silhouette(set(SIDES))
+        cv.silhouette(set(SIDES), corner=0.012)
         cv.save(path)
 
 
